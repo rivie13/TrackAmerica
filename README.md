@@ -8,6 +8,3 @@ How to use
 
 Contributing
 - Open issues and PRs
-
-
-quick test...
