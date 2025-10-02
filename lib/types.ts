@@ -1,5 +1,9 @@
 // Shared TypeScript types for TrackAmerica
 
+// ============================================
+// Core Domain Types
+// ============================================
+
 export interface Representative {
   id: string;
   bioguideId: string;
