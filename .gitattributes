@@ -1,0 +1,24 @@
+# Set default line ending behavior
+# Git will convert CRLF to LF on commit, and LF to CRLF on checkout (Windows default)
+* text=auto
+
+# Explicitly declare files that should always use LF (Unix-style)
+*.sh text eol=lf
+*.bash text eol=lf
+.husky/* text eol=lf
+
+# Explicitly declare files that should always use CRLF (Windows-style)
+*.bat text eol=crlf
+*.cmd text eol=crlf
+
+# Denote binary files (don't normalize line endings)
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.ico binary
+*.woff binary
+*.woff2 binary
+*.ttf binary
+*.eot binary
+*.pdf binary
