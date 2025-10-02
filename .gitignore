@@ -5,6 +5,26 @@ desktop.ini
 
 # Node
 node_modules/
+npm-debug.log
+yarn-error.log
+
+# Expo
+.expo/
+dist/
+web-build/
+
+# Native
+*.orig.*
+*.jks
+*.p8
+*.p12
+*.key
+*.mobileprovision
+*.orig.*
+.expo-shared/
+
+# Metro
+.metro-health-check*
 
 # Python
 __pycache__/
