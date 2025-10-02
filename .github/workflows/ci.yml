@@ -1,9 +1,8 @@
 name: CI
 
 on:
+  # Run on all pull requests to main or dev
   pull_request:
-    branches: [main, dev]
-  push:
     branches: [main, dev]
 
 jobs:
