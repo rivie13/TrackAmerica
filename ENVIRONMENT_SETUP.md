@@ -2,6 +2,25 @@
 
 This guide explains how to obtain and configure all required API keys and services for TrackAmerica.
 
+## Prerequisites
+
+**Required Software:**
+- **Node.js 22+ (LTS)** - [Download here](https://nodejs.org/)
+- **npm 9+** - Comes with Node.js
+- **PostgreSQL 14+** - [Download here](https://www.postgresql.org/download/)
+
+**Check your versions:**
+```bash
+node --version   # Should be v22.x.x or higher
+npm --version    # Should be 9.x.x or higher
+```
+
+**If you need to install/upgrade Node.js:**
+- Use [nvm](https://github.com/nvm-sh/nvm) (recommended): `nvm install 22 && nvm use 22`
+- Or download from [nodejs.org](https://nodejs.org/) (choose LTS version)
+
+---
+
 ## Quick Start
 
 1. Copy the environment template:
@@ -212,17 +231,25 @@ After setting up your `.env` file, verify it works:
 - Check deployment names match exactly
 - Ensure models are deployed in Azure OpenAI Studio
 
+### Node.js version errors
+- Check your Node.js version: `node --version`
+- Must be v22.0.0 or higher
+- Install/upgrade: `nvm install 22 && nvm use 22` (or download from nodejs.org)
+- After upgrading, run `npm install` again
+
 ---
 
 ## Next Steps
 
-1. Get Congress.gov API key (takes 5 minutes)
-2. Install PostgreSQL locally (takes 15 minutes)
-3. Create Azure OpenAI resource (takes 10 minutes)
-4. Fill in `.env` file
-5. Start building! 🚀
+1. **Install Node.js 22 LTS** (if not already installed)
+2. Get Congress.gov API key (takes 5 minutes)
+3. Install PostgreSQL locally (takes 15 minutes)
+4. Create Azure OpenAI resource (takes 10 minutes)
+5. Fill in `.env` file
+6. Start building! 🚀
 
 For more help, see:
+- Node.js downloads: https://nodejs.org/
 - Congress.gov API docs: https://api.congress.gov/
 - Azure OpenAI docs: https://learn.microsoft.com/azure/ai-services/openai/
 - PostgreSQL docs: https://www.postgresql.org/docs/
