@@ -70,7 +70,7 @@ Build a **web + mobile app** that shows:
 
 | Technology | Purpose | Why |
 |------------|---------|-----|
-| **Azure OpenAI** | AI chatbot | GPT-4o for answering questions |
+| **Azure OpenAI** | AI chatbot | GPT-4o for answering questions | [TBD what model will be used] |
 | **text-embedding-ada-002** | Embeddings | Convert bill text to vectors |
 
 ---
@@ -159,6 +159,7 @@ Build a **web + mobile app** that shows:
 ---
 
 ## 🔐 Environment Variables Needed
+- **Azure OpenAI** - GPT-4o (TBD what model will be used) for chatbot, embeddings for semantic search
 
 ```bash
 # Congress.gov API
@@ -181,7 +182,7 @@ NODE_ENV=development
 ---
 
 ## 📊 Architecture Diagram
-
+- <TBD> model to be decided for now examples uses 4o
 ```
 ┌─────────────────────────────────────┐
 │   Expo App (Web + iOS + Android)    │

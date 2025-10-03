@@ -36,9 +36,12 @@ Examples:
 
 ### Subject (Required)
 
-- Short description (max 100 characters)
-- Lowercase, no period at end
+- Short description (max 100 characters total for `type(scope): subject`)
+- **Must be all lowercase** - no uppercase letters allowed
+- **No punctuation** - no periods, commas, apostrophes, or special characters
+- No period at end
 - Imperative mood ("add" not "added" or "adds")
+- Use hyphens instead of spaces in multi-word terms (e.g., "congress-api" not "Congress.gov API")
 
 ### Body (Optional)
 
@@ -65,14 +68,14 @@ Closes #42
 ```
 
 ```
-fix(api): handle rate limiting for Congress.gov API
+fix(api): handle rate limiting for congress api
 
 Added exponential backoff when hitting rate limits (5000 req/hour).
 Requests now retry up to 3 times with increasing delays.
 ```
 
 ```
-docs: update README with setup instructions
+docs: update readme with setup instructions
 ```
 
 ```
@@ -88,17 +91,27 @@ Added new feature
 
 ```
 fix: Fixed bug
-(Not descriptive, "fixed" instead of "fix")
+(Capital F in "Fixed", should be all lowercase)
 ```
 
 ```
 FEAT: Add Map Component
-(Type should be lowercase)
+(Type and subject should be lowercase)
 ```
 
 ```
 feat(map): Added clickable states.
-(Subject ends with period, not imperative)
+(Capital A in "Added", ends with period, not imperative)
+```
+
+```
+fix(api): handle Congress.gov API errors
+(Capital C, contains periods - must be all lowercase with no punctuation)
+```
+
+```
+feat: add user's profile page
+(Contains apostrophe - not allowed, use "add user profile page")
 ```
 
 ## Git Hooks
