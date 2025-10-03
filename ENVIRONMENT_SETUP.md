@@ -93,7 +93,7 @@ DATABASE_URL=postgresql://postgres:your_password@localhost:5432/trackamerica
 
 ### 3. Azure OpenAI Service
 
-**What it's for:** AI chatbot (GPT-4o) and bill embeddings (text-embedding-ada-002)
+**What it's for:** AI chatbot (GPT-4o) [TBD what model will be used] and bill embeddings (text-embedding-ada-002)
 
 **How to get it:**
 
@@ -122,6 +122,7 @@ DATABASE_URL=postgresql://postgres:your_password@localhost:5432/trackamerica
    - Click "+ Create new deployment"
    
    **Deploy GPT-4o for chat:**
+   - <TBD> AI model to be decided for now examples uses 4o
    - Model: gpt-4o
    - Deployment name: `gpt-4o-deployment` (use this exact name or update .env)
    - Click Create
@@ -140,6 +141,7 @@ DATABASE_URL=postgresql://postgres:your_password@localhost:5432/trackamerica
      - **Key 1** (your API key)
 
 5. **Add to `.env`**:
+    - <TBD> model to be decided for now examples uses 4o
    ```
    AZURE_OPENAI_ENDPOINT=https://your-resource-name.openai.azure.com/
    AZURE_OPENAI_API_KEY=your_api_key_here
@@ -149,7 +151,7 @@ DATABASE_URL=postgresql://postgres:your_password@localhost:5432/trackamerica
 
 **Cost:** 
 - Pay-per-use (only charged when you make requests)
-- GPT-4o: ~$0.03 per 1,000 tokens (~750 words)
+- GPT-4o: ~$0.03 per 1,000 tokens (~750 words) [examples use 4o, model to be decided later]
 - Embeddings: ~$0.0001 per 1,000 tokens
 - Estimated monthly cost for development: $10-50
 
