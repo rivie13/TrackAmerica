@@ -11,17 +11,32 @@ architecture, local workflows, important files, and conventions.
 
 - Big picture
   - Mono-repo for an Expo React Native app (web + mobile) and a small Express API.
-  - Frontend uses Expo + Expo Router in `app/` (pages) with components in `components/`.
-  - Backend API is expected under an `api/` folder (Express + TypeScript + Prisma).
-  - Postgres + pgvector (Prisma) is the canonical data store; Azure OpenAI is used for embeddings/chat.
+  - Frontend uses Expo + Expo Router with file-based routing in `app/` directory.
+  - Components organized by feature domain in `components/` (ui, map, representatives, chat).
+  - Backend API under `api/` folder (Express + TypeScript + Prisma).
+  - Postgres + pgvector (Prisma) is the canonical data store; Azure OpenAI for embeddings/chat.
 
 - Where to look (examples)
   - `IMPLEMENTATION_PLAN.md` — authoritative project plan, dev commands, DB schema examples.
   - `TECH_STACK.md` — technologies, env var names, and deployment targets.
-  - `app/` — Expo Router pages (home `index.tsx`, `state/[code].tsx`, `_layout.tsx`).
-  - `components/USAMap.tsx`, `components/RepCard.tsx`, `components/ChatBot.tsx` — expected components.
+  - `app/README.md` — route groups, navigation patterns, file-based routing explained.
+  - `app/(tabs)/index.tsx` — home screen (URL: `/`).
+  - `app/(states)/[code].tsx` — dynamic state detail page (URL: `/california`, `/texas`).
+  - `components/README.md` — component organization (ui, map, representatives, chat).
+  - `components/ui/` — generic UI components (PageTitle, Subtitle, StatusCard).
+  - `components/map/USAMap.tsx` — interactive USA map (planned).
+  - `components/representatives/RepCard.tsx` — representative card (planned).
+  - `lib/README.md` — utilities, API clients, shared types documentation.
+  - `lib/types.ts` — shared TypeScript interfaces.
+  - `lib/api-client.ts` — helper functions to call backend API (planned).
   - `api/` — Express server; watch for `GET /api/representatives/:state`, `/api/bills/:billId`, `/api/chat`.
   - `prisma/schema.prisma` — data models (Representative, Bill, Vote, BillChunk).
+
+- Route groups (important!)
+  - `app/(tabs)/` — main navigation group (URL: `/`, not `/tabs/`)
+  - `app/(states)/` — state detail pages (URL: `/california`, not `/states/california`)
+  - Parentheses `()` in folder names = route group (organization without URL impact)
+  - Each group has `_layout.tsx` defining navigation structure (Stack, Tabs, etc)
 
 - Development & build commands (use these exact or verify first)
   - Frontend: run in repo root (project name `trackamerica`): `npm start`, `npm run web`, `npm run ios`, `npm run android`.
@@ -33,8 +48,13 @@ architecture, local workflows, important files, and conventions.
 
 - Code & design conventions
   - TypeScript throughout. Prefer adding small, typed changes and export/import shared types in `lib/types.ts`.
-  - Keep components small and single-purpose (see Implementation Plan examples).
+  - Keep components small and single-purpose (one component = one responsibility).
+  - Organize components by feature domain (ui, map, representatives, chat), not by type.
+  - Use route groups `(group)` to organize pages without affecting URLs.
+  - Use NativeWind for styling: `className` with Tailwind utilities (not StyleSheet).
+  - Export components from feature barrel exports (`components/ui/index.ts`) and main barrel (`components/index.ts`).
   - Use console logging for debugging in early feature work; add proper error handling when stabilizing.
+  - **Frontend (`lib/`) only calls OUR backend API** — no direct Congress.gov or Azure calls from frontend.
   - For API code: prefer caching-check-then-fetch pattern: check DB (Prisma) ➜ if missing call Congress.gov ➜ persist ➜ return.
   - Embeddings workflow: chunk bill text (~500 words), call Azure embedding deployment, store vector in `BillChunk.embedding` (pgvector).
 
