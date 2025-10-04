@@ -87,31 +87,71 @@
 
 ```
 TrackAmerica/
-├── app/                    # Expo Router pages (frontend)
-│   ├── index.tsx          # Home screen
-│   ├── state/[code].tsx   # State details page (planned)
-│   └── _layout.tsx        # Root layout
-├── components/            # Reusable React components (planned)
-│   ├── USAMap.tsx        # Interactive map (planned)
-│   ├── RepCard.tsx       # Representative card (planned)
-│   └── ChatBot.tsx       # AI chatbot (planned)
-├── lib/                   # Shared utilities and types
-│   └── types.ts          # TypeScript interfaces
-├── api/                   # Express backend server
-│   ├── controllers/      # Business logic (planned)
-│   ├── routes/           # API route handlers (planned)
-│   ├── services/         # External API clients (planned)
-│   ├── middleware/       # Custom middleware (planned)
-│   └── server.ts         # Express server entry point
-├── prisma/               # Database schema and migrations (planned)
+├── app/                       # Expo Router file-based routing (pages)
+│   ├── _layout.tsx           # Root layout (runs first, initialization)
+│   ├── (tabs)/               # Route group: main navigation (URL: /)
+│   │   ├── _layout.tsx      # Tab layout (Stack, will become Tabs)
+│   │   └── index.tsx        # Home screen (URL: /)
+│   ├── (states)/             # Route group: state detail pages
+│   │   ├── _layout.tsx      # States layout (Stack with back button)
+│   │   └── [code].tsx       # Dynamic route (URL: /california, /texas, etc)
+│   └── README.md            # Route groups and navigation docs
+├── components/               # Reusable React components (feature-based)
+│   ├── ui/                  # Generic UI components (buttons, cards, text)
+│   │   ├── PageTitle.tsx   ✅ Main title component
+│   │   ├── Subtitle.tsx    ✅ Subtitle text
+│   │   ├── StatusCard.tsx  ✅ Status card with variants
+│   │   └── index.ts        # UI barrel export
+│   ├── map/                 # Map components (USA map, state shapes)
+│   │   └── USAMap.tsx      # Interactive SVG map (planned)
+│   ├── representatives/     # Representative components (cards, votes)
+│   │   └── RepCard.tsx     # Rep info card (planned)
+│   ├── chat/                # AI chatbot components
+│   │   └── ChatBot.tsx     # Chat interface (planned)
+│   ├── index.ts            # Main component barrel export
+│   └── README.md           # Component organization guide
+├── lib/                     # Shared utilities and types (frontend only)
+│   ├── types.ts           # Shared TypeScript interfaces
+│   └── api-client.ts      # Helper functions to call backend API (planned)
+│   └── README.md          # Library documentation
+├── api/                    # Express backend server
+│   ├── controllers/       # Business logic (planned)
+│   ├── routes/            # API route handlers (planned)
+│   ├── services/          # External API integrations (planned)
+│   ├── middleware/        # Custom middleware (planned)
+│   ├── server.ts          # Express entry point
+│   └── README.md          # API documentation
+├── prisma/                # Database schema and migrations (planned)
 │   └── schema.prisma     # Prisma schema (planned)
-├── .github/              # GitHub Actions, branch protection, instructions
-│   ├── workflows/        # CI/CD pipelines
+├── .github/               # GitHub Actions, workflows, instructions
+│   ├── workflows/        # CI/CD pipelines (lint, type-check, build)
 │   └── instructions/     # AI coding agent rules
-├── .husky/               # Git hooks (pre-commit, commit-msg)
+├── .husky/                # Git hooks (pre-commit, commit-msg)
+├── global.css            # Tailwind CSS directives for NativeWind
 ├── .env.example          # Environment variable template
 └── package.json          # Dependencies and scripts
 ```
+
+### Directory Organization Philosophy
+
+**Route Groups (app/):**
+- Use `(group)` syntax for organization without affecting URLs
+- Each group has its own `_layout.tsx` defining navigation structure
+- Example: `app/(tabs)/index.tsx` → URL is `/`, not `/tabs/`
+
+**Feature-Based Components (components/):**
+- Organized by domain (`ui`, `map`, `representatives`, `chat`)
+- Avoids dumping everything into one flat directory
+- Easy to find components related to specific features
+- Each feature has a barrel export (`index.ts`)
+
+**Utilities & Types (lib/):**
+- Pure functions, API clients, shared types
+- **Frontend only** - calls our backend API at `/api/*`
+- No direct calls to Congress.gov or Azure (that's backend's job)
+- Simple and flat structure (types.ts, api-client.ts)
+
+See individual `README.md` files in each directory for detailed documentation.
 
 ---
 
