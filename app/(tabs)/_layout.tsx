@@ -9,7 +9,16 @@ export default function TabsLayout() {
   return (
     <Stack
       screenOptions={{
-        headerShown: false, // We'll add custom headers per-screen if needed
+        headerShown: true,
+        headerTitle: 'TrackAmerica',
+        headerStyle: {
+          backgroundColor: '#fff',
+        },
+        headerTintColor: '#000',
+        headerTitleStyle: {
+          fontWeight: 'bold',
+        },
+        headerShadowVisible: true,
       }}
     />
   );
