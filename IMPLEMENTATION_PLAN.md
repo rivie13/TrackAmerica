@@ -40,19 +40,40 @@
 **Folder Structure:**
 ```
 trackamerica/
-├── app/                    # Expo Router pages
-│   ├── index.tsx          # Home page (USA map)
-│   ├── state/[code].tsx   # State detail page
-│   └── _layout.tsx        # Root layout
-├── components/            # Reusable components
-│   ├── USAMap.tsx        # Interactive map
-│   ├── RepCard.tsx       # Representative card
-│   └── ChatBot.tsx       # Chat interface
-├── lib/                   # Utilities
-│   ├── api.ts            # API client
-│   └── types.ts          # TypeScript types
-└── .env                   # Environment variables
+├── app/                       # Expo Router file-based routing
+│   ├── _layout.tsx           # Root layout (initialization, global providers)
+│   ├── (tabs)/               # Route group for main navigation
+│   │   ├── _layout.tsx      # Tab layout (Stack → will become Tabs)
+│   │   └── index.tsx        # Home page (URL: /)
+│   ├── (states)/             # Route group for state detail pages
+│   │   ├── _layout.tsx      # States layout (Stack with back button)
+│   │   └── [code].tsx       # Dynamic state route (URL: /california, /texas)
+│   └── README.md            # Navigation and routing documentation
+├── components/               # Reusable React components (feature-based)
+│   ├── ui/                  # Generic UI components (PageTitle, StatusCard, etc)
+│   ├── map/                 # Map components (USAMap, StateShape) [planned]
+│   ├── representatives/     # Representative components (RepCard, VoteRecord) [planned]
+│   ├── chat/                # AI chatbot components (ChatBot, ChatMessage) [planned]
+│   ├── index.ts            # Main barrel export
+│   └── README.md           # Component organization guide
+├── lib/                     # Shared utilities and types (frontend only)
+│   ├── types.ts           # Shared TypeScript interfaces
+│   ├── api-client.ts      # Helper functions to call backend (planned)
+│   └── README.md          # Library documentation
+└── .env                    # Environment variables
 ```
+
+**Route Groups Explained:**
+- `(tabs)` and `(states)` are **route groups** (parentheses)
+- They organize files without affecting URLs
+- Example: `app/(tabs)/index.tsx` → URL is `/` (not `/tabs/`)
+- Each group has its own `_layout.tsx` for navigation structure
+
+**Component Organization:**
+- Feature-based structure (`ui/`, `map/`, `representatives/`, `chat/`)
+- Avoids flat "dump all files here" anti-pattern
+- Easy to find components by feature domain
+- Each feature folder has barrel export (`index.ts`)
 
 #### Week 2: USA Map & Navigation
 - [ ] Find/create simple SVG USA map
