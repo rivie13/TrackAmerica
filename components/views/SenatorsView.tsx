@@ -15,7 +15,7 @@
  */
 
 import React from 'react';
-import { View, Text, ScrollView } from 'react-native';
+import { View, Text, ScrollView, Dimensions } from 'react-native';
 
 import USAMap from '@/components/map/USAMap';
 import { STATE_INFO } from '@/lib/data/states';
@@ -42,6 +42,11 @@ export function SenatorsView({ stateCode }: SenatorsViewProps) {
   const normalizedCode = stateCode.toLowerCase();
   const stateInfo = STATE_INFO[normalizedCode];
 
+  // Get screen dimensions for responsive map sizing
+  const screenWidth = Dimensions.get('window').width;
+  const mapWidth = Math.min(screenWidth - 32, 500); // Max 500px, with 32px padding
+  const mapHeight = Math.min((screenWidth - 32) * 0.75, 375); // 3:4 aspect ratio
+
   if (!stateInfo) {
     return (
       <View className="flex items-center justify-center p-6">
@@ -55,7 +60,7 @@ export function SenatorsView({ stateCode }: SenatorsViewProps) {
       <View className="items-center justify-center p-6">
         {/* State Outline Map - using existing USAMap component */}
         <View className="mb-6">
-          <USAMap width={400} height={300} filterStateCode={stateCode} />
+          <USAMap width={mapWidth} height={mapHeight} filterStateCode={stateCode} />
         </View>
 
         {/* Senator Information Header */}

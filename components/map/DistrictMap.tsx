@@ -13,6 +13,8 @@
  * - Renders districts as SVG paths using react-native-svg
  * - Gray fill color (no party colors until Congress.gov API integration)
  * - Albers USA projection for accurate visualization
+ * - Pinch-to-zoom and pan gestures for mobile
+ * - Responsive sizing for different screen sizes
  *
  * Future enhancements:
  * - Click interactions to select districts
@@ -22,8 +24,10 @@
  */
 
 import React, { useEffect, useState } from 'react';
-import { View, Text, ActivityIndicator } from 'react-native';
+import { View, Text, ActivityIndicator, Dimensions } from 'react-native';
 import Svg, { Path, G } from 'react-native-svg';
+import { GestureDetector, Gesture } from 'react-native-gesture-handler';
+import Animated, { useSharedValue, useAnimatedStyle } from 'react-native-reanimated';
 import { feature } from 'topojson-client';
 import type { GeometryCollection, Topology } from 'topojson-specification';
 
@@ -56,10 +60,54 @@ interface DistrictMapProps {
  * <DistrictMap stateCode="PA" width={400} height={300} />
  * ```
  */
-export function DistrictMap({ stateCode, width = 400, height = 300 }: DistrictMapProps) {
+export function DistrictMap({ stateCode, width, height }: DistrictMapProps) {
   const [topology, setTopology] = useState<Topology | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+
+  // Get screen dimensions for responsive sizing
+  const screenWidth = Dimensions.get('window').width;
+  const mapWidth = width || screenWidth - 32;
+  const mapHeight = height || 400;
+
+  // Zoom and pan state - MUST be declared before any conditional returns
+  const zoomScale = useSharedValue(1);
+  const savedZoomScale = useSharedValue(1);
+  const panX = useSharedValue(0);
+  const panY = useSharedValue(0);
+  const savedPanX = useSharedValue(0);
+  const savedPanY = useSharedValue(0);
+
+  // Pinch gesture for zooming
+  const pinchGesture = Gesture.Pinch()
+    .onUpdate((event) => {
+      zoomScale.value = savedZoomScale.value * event.scale;
+      // Clamp scale between 1x and 5x
+      zoomScale.value = Math.max(1, Math.min(5, zoomScale.value));
+    })
+    .onEnd(() => {
+      savedZoomScale.value = zoomScale.value;
+    });
+
+  // Pan gesture for dragging - only activate after minimum distance
+  const panGesture = Gesture.Pan()
+    .minDistance(10) // Require 10px movement before activating pan
+    .onUpdate((event) => {
+      panX.value = savedPanX.value + event.translationX;
+      panY.value = savedPanY.value + event.translationY;
+    })
+    .onEnd(() => {
+      savedPanX.value = panX.value;
+      savedPanY.value = panY.value;
+    });
+
+  // Combine gestures - allow pinch and pan simultaneously
+  const composedGesture = Gesture.Simultaneous(pinchGesture, panGesture);
+
+  // Animated styles for zoom and pan
+  const animatedStyles = useAnimatedStyle(() => ({
+    transform: [{ translateX: panX.value }, { translateY: panY.value }, { scale: zoomScale.value }],
+  }));
 
   // Load TopoJSON file at runtime
   useEffect(() => {
@@ -103,7 +151,10 @@ export function DistrictMap({ stateCode, width = 400, height = 300 }: DistrictMa
   // Show loading state
   if (loading) {
     return (
-      <View className="flex items-center justify-center" style={{ width, height }}>
+      <View
+        className="flex items-center justify-center"
+        style={{ width: mapWidth, height: mapHeight }}
+      >
         <ActivityIndicator size="large" color="#6366f1" />
         <Text className="text-gray-500 mt-2">Loading districts...</Text>
       </View>
@@ -211,10 +262,10 @@ export function DistrictMap({ stateCode, width = 400, height = 300 }: DistrictMa
   const geoHeight = bounds.maxY - bounds.minY;
 
   // Calculate scale and translation to fit districts in viewport
-  const scale = Math.min(width / geoWidth, height / geoHeight) * 0.95; // 95% to add padding
-  const translateX = (width - geoWidth * scale) / 2 - bounds.minX * scale;
+  const geoScale = Math.min(mapWidth / geoWidth, mapHeight / geoHeight) * 0.95; // 95% to add padding
+  const geoTranslateX = (mapWidth - geoWidth * geoScale) / 2 - bounds.minX * geoScale;
   // FLIP Y AXIS: SVG y coordinates increase downward, but geo coordinates increase upward
-  const translateY = (height + geoHeight * scale) / 2 + bounds.minY * scale;
+  const geoTranslateY = (mapHeight + geoHeight * geoScale) / 2 + bounds.minY * geoScale;
 
   /**
    * Convert GeoJSON coordinates to SVG path string
@@ -224,9 +275,9 @@ export function DistrictMap({ stateCode, width = 400, height = 300 }: DistrictMa
       coords
         .map((coord, i) => {
           const [x, y] = coord;
-          const scaledX = x * scale + translateX;
+          const scaledX = x * geoScale + geoTranslateX;
           // FLIP Y: negate the scaled Y coordinate to flip vertically
-          const scaledY = -y * scale + translateY;
+          const scaledY = -y * geoScale + geoTranslateY;
           return `${i === 0 ? 'M' : 'L'}${scaledX},${scaledY}`;
         })
         .join(' ') + 'Z'
@@ -250,34 +301,41 @@ export function DistrictMap({ stateCode, width = 400, height = 300 }: DistrictMa
   }
 
   return (
-    <View className="flex items-center justify-center" style={{ width, height }}>
-      <Svg width={width} height={height} viewBox={`0 0 ${width} ${height}`}>
-        <G>
-          {stateDistricts.map((district, index) => {
-            const props = district.properties as {
-              GEOID?: string;
-              NAMELSAD?: string;
-              CD119FP?: string;
-            };
-            const districtId = props.GEOID || `district-${index}`;
-            const districtName = props.NAMELSAD || 'Unknown District';
+    <View
+      className="flex items-center justify-center"
+      style={{ width: mapWidth, height: mapHeight }}
+    >
+      <GestureDetector gesture={composedGesture}>
+        <Animated.View style={[{ width: '100%', height: '100%' }, animatedStyles]}>
+          <Svg width={mapWidth} height={mapHeight} viewBox={`0 0 ${mapWidth} ${mapHeight}`}>
+            <G>
+              {stateDistricts.map((district, index) => {
+                const props = district.properties as {
+                  GEOID?: string;
+                  NAMELSAD?: string;
+                  CD119FP?: string;
+                };
+                const districtId = props.GEOID || `district-${index}`;
+                const districtName = props.NAMELSAD || 'Unknown District';
 
-            return (
-              <Path
-                key={districtId}
-                d={districtToPath(district)}
-                fill="#E5E7EB" // Gray fill (neutral until API integration)
-                stroke="#6B7280" // Darker gray border
-                strokeWidth={1}
-                onPress={() => {
-                  // Future: handle district selection
-                  console.log(`[DistrictMap] Clicked: ${districtName}`);
-                }}
-              />
-            );
-          })}
-        </G>
-      </Svg>
+                return (
+                  <Path
+                    key={districtId}
+                    d={districtToPath(district)}
+                    fill="#E5E7EB" // Gray fill (neutral until API integration)
+                    stroke="#6B7280" // Darker gray border
+                    strokeWidth={1}
+                    onPress={() => {
+                      // Future: handle district selection
+                      console.log(`[DistrictMap] Clicked: ${districtName}`);
+                    }}
+                  />
+                );
+              })}
+            </G>
+          </Svg>
+        </Animated.View>
+      </GestureDetector>
     </View>
   );
 }

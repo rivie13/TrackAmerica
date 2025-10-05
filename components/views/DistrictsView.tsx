@@ -13,7 +13,7 @@
  */
 
 import React from 'react';
-import { View, Text } from 'react-native';
+import { View, Text, Dimensions } from 'react-native';
 
 import { DistrictMap } from '@/components/map/DistrictMap';
 import { STATE_INFO } from '@/lib/data/states';
@@ -39,6 +39,10 @@ export function DistrictsView({ stateCode }: DistrictsViewProps) {
   const normalizedCode = stateCode.toLowerCase();
   const stateInfo = STATE_INFO[normalizedCode];
 
+  // Get screen dimensions for responsive map sizing
+  const screenWidth = Dimensions.get('window').width;
+  const mapSize = Math.min(screenWidth - 32, 500); // Max 500px, with 32px padding
+
   if (!stateInfo) {
     return (
       <View className="flex items-center justify-center p-6">
@@ -51,7 +55,7 @@ export function DistrictsView({ stateCode }: DistrictsViewProps) {
     <View className="flex-1">
       {/* Congressional District Map */}
       <View className="items-center justify-center mb-6">
-        <DistrictMap stateCode={stateCode.toUpperCase()} width={400} height={400} />
+        <DistrictMap stateCode={stateCode.toUpperCase()} width={mapSize} height={mapSize} />
       </View>
 
       {/* Future: Representative cards for each district */}
