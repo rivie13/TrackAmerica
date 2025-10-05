@@ -3,67 +3,9 @@ import { View, Dimensions } from 'react-native';
 import Svg, { Path, G } from 'react-native-svg';
 import { useRouter } from 'expo-router';
 import * as topojson from 'topojson-client';
-import statesData from '../../assets/maps/states-albers-10m.json';
-
-// State FIPS code to abbreviation mapping
-const STATE_CODES: Record<string, string> = {
-  '01': 'al',
-  '02': 'ak',
-  '04': 'az',
-  '05': 'ar',
-  '06': 'ca',
-  '08': 'co',
-  '09': 'ct',
-  '10': 'de',
-  '11': 'dc',
-  '12': 'fl',
-  '13': 'ga',
-  '15': 'hi',
-  '16': 'id',
-  '17': 'il',
-  '18': 'in',
-  '19': 'ia',
-  '20': 'ks',
-  '21': 'ky',
-  '22': 'la',
-  '23': 'me',
-  '24': 'md',
-  '25': 'ma',
-  '26': 'mi',
-  '27': 'mn',
-  '28': 'ms',
-  '29': 'mo',
-  '30': 'mt',
-  '31': 'ne',
-  '32': 'nv',
-  '33': 'nh',
-  '34': 'nj',
-  '35': 'nm',
-  '36': 'ny',
-  '37': 'nc',
-  '38': 'nd',
-  '39': 'oh',
-  '40': 'ok',
-  '41': 'or',
-  '42': 'pa',
-  '44': 'ri',
-  '45': 'sc',
-  '46': 'sd',
-  '47': 'tn',
-  '48': 'tx',
-  '49': 'ut',
-  '50': 'vt',
-  '51': 'va',
-  '53': 'wa',
-  '54': 'wv',
-  '55': 'wi',
-  '56': 'wy',
-  '60': 'as',
-  '66': 'gu',
-  '69': 'mp',
-  '72': 'pr',
-  '78': 'vi',
-};
+import statesData from '@/assets/maps/states-albers-10m.json';
+import { getStateByFips, getStateColor } from '@/lib/data/states';
+import { geoPath } from '@/lib/utils/map-geometry';
 
 interface USAMapProps {
   /** Optional CSS class name for styling */
@@ -74,42 +16,12 @@ interface USAMapProps {
   height?: number | string;
 }
 
-// Helper function to convert TopoJSON geometry to SVG path
-function geoPath(geometry: any): string {
-  if (!geometry || !geometry.coordinates) return '';
-
-  const coordinates = geometry.coordinates;
-  let path = '';
-
-  const drawRing = (ring: any[]) => {
-    return ring
-      .map((point, i) => {
-        const [x, y] = point;
-        return `${i === 0 ? 'M' : 'L'}${x},${y}`;
-      })
-      .join('');
-  };
-
-  if (geometry.type === 'Polygon') {
-    coordinates.forEach((ring: any[]) => {
-      path += drawRing(ring) + 'Z';
-    });
-  } else if (geometry.type === 'MultiPolygon') {
-    coordinates.forEach((polygon: any[]) => {
-      polygon.forEach((ring: any[]) => {
-        path += drawRing(ring) + 'Z';
-      });
-    });
-  }
-
-  return path;
-}
-
 /**
  * Interactive USA map component using react-native-svg
  *
  * Features:
  * - Clickable states that navigate to state detail pages using abbreviations (e.g., /ca, /tx)
+ * - Color-coded by political leaning (red/blue/purple)
  * - Hover effects for better UX
  * - Responsive container sizing
  * - Uses TopoJSON data from us-atlas
@@ -136,9 +48,9 @@ export default function USAMap({ className, width, height = 500 }: USAMapProps) 
   const viewBox = '0 0 975 610';
 
   const handleStatePress = (stateId: string) => {
-    const stateCode = STATE_CODES[stateId];
-    if (stateCode) {
-      router.push(`/${stateCode}` as any);
+    const stateInfo = getStateByFips(stateId);
+    if (stateInfo) {
+      router.push(`/${stateInfo.code}` as any);
     }
   };
 
@@ -148,16 +60,22 @@ export default function USAMap({ className, width, height = 500 }: USAMapProps) 
         <G>
           {geojson.features.map((feature: any) => {
             const stateId = feature.id;
+            const stateInfo = getStateByFips(stateId);
             const isHovered = hoveredState === stateId;
             const pathData = geoPath(feature.geometry);
+
+            // Get colors based on political leaning
+            const colors = stateInfo
+              ? getStateColor(stateInfo.political)
+              : { fill: '#d6d6da', stroke: '#ffffff' };
 
             return (
               <Path
                 key={stateId}
                 d={pathData}
-                fill={isHovered ? '#3b82f6' : '#d6d6da'}
-                stroke="#ffffff"
-                strokeWidth={0.5}
+                fill={isHovered ? '#60a5fa' : colors.fill}
+                stroke={colors.stroke}
+                strokeWidth={0.75}
                 onPress={() => handleStatePress(stateId)}
                 onPressIn={() => setHoveredState(stateId)}
                 onPressOut={() => setHoveredState(null)}
