@@ -10,6 +10,9 @@ web-build/
 # Logs
 *.log
 
+# External data files (TopoJSON maps - don't format these)
+assets/maps/*.json
+
 # OS files
 .DS_Store
 Thumbs.db

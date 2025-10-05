@@ -5,7 +5,7 @@ export { Subtitle } from './ui/Subtitle';
 export { StatusCard } from './ui/StatusCard';
 
 // Map Components (USA map and state selection)
-// export { USAMap } from './map/USAMap';
+export { default as USAMap } from './map/USAMap';
 
 // Representative Components (rep cards, vote records)
 // export { RepCard } from './representatives/RepCard';
