@@ -93,11 +93,11 @@ export default function USAMap({ className, width, height = 500, filterStateCode
       processCoords(coords);
     });
 
-    // Add padding (10% on each side)
-    const width = maxX - minX;
-    const height = maxY - minY;
-    const paddingX = width * 0.1;
-    const paddingY = height * 0.1;
+    // Add padding (20% on each side for better visibility)
+    const boundsWidth = maxX - minX;
+    const boundsHeight = maxY - minY;
+    const paddingX = boundsWidth * 0.2;
+    const paddingY = boundsHeight * 0.2;
 
     minX -= paddingX;
     maxX += paddingX;
@@ -127,10 +127,18 @@ export default function USAMap({ className, width, height = 500, filterStateCode
 
   // Pan gesture for dragging - only activate after minimum distance
   const panGesture = Gesture.Pan()
-    .minDistance(10) // Require 10px movement before activating pan
+    .minDistance(20) // Require 20px movement before activating pan (increased from 10 for better tap detection)
     .onUpdate((event) => {
-      translateX.value = savedTranslateX.value + event.translationX;
-      translateY.value = savedTranslateY.value + event.translationY;
+      const newX = savedTranslateX.value + event.translationX;
+      const newY = savedTranslateY.value + event.translationY;
+
+      // Calculate bounds based on current scale
+      // When zoomed in, allow more panning; when zoomed out, restrict panning
+      const maxPan = (scale.value - 1) * 200; // Allow more panning when zoomed in
+
+      // Clamp translation to prevent panning too far off screen
+      translateX.value = Math.max(-maxPan, Math.min(maxPan, newX));
+      translateY.value = Math.max(-maxPan, Math.min(maxPan, newY));
     })
     .onEnd(() => {
       savedTranslateX.value = translateX.value;
@@ -154,7 +162,7 @@ export default function USAMap({ className, width, height = 500, filterStateCode
     <View className={className} style={{ width: mapWidth, height: mapHeight }}>
       <GestureDetector gesture={composedGesture}>
         <Animated.View style={[{ width: '100%', height: '100%' }, animatedStyles]}>
-          <Svg width="100%" height="100%" viewBox={viewBox}>
+          <Svg width="100%" height="100%" viewBox={viewBox} preserveAspectRatio="xMidYMid meet">
             <G>
               {features.map((feature: any) => {
                 const stateId = feature.id;
@@ -168,17 +176,26 @@ export default function USAMap({ className, width, height = 500, filterStateCode
                   : { fill: '#d6d6da', stroke: '#ffffff' };
 
                 return (
-                  <Path
-                    key={stateId}
-                    d={pathData}
-                    fill={isHovered ? '#60a5fa' : colors.fill}
-                    stroke={colors.stroke}
-                    strokeWidth={0.75}
-                    // Increased stroke width for better touch target
-                    onPress={() => handleStatePress(stateId)}
-                    onPressIn={() => setHoveredState(stateId)}
-                    onPressOut={() => setHoveredState(null)}
-                  />
+                  <G key={stateId}>
+                    {/* Invisible larger hit area for easier tapping */}
+                    <Path
+                      d={pathData}
+                      fill="transparent"
+                      stroke="transparent"
+                      strokeWidth={30} // Large invisible stroke for better touch target (increased from 15)
+                      onPress={() => handleStatePress(stateId)}
+                      onPressIn={() => setHoveredState(stateId)}
+                      onPressOut={() => setHoveredState(null)}
+                    />
+                    {/* Visible state path */}
+                    <Path
+                      d={pathData}
+                      fill={isHovered ? '#60a5fa' : colors.fill}
+                      stroke={colors.stroke}
+                      strokeWidth={2}
+                      pointerEvents="none" // Let the invisible overlay handle touches
+                    />
+                  </G>
                 );
               })}
             </G>

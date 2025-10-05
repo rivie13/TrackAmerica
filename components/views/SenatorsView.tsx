@@ -45,7 +45,7 @@ export function SenatorsView({ stateCode }: SenatorsViewProps) {
   // Get screen dimensions for responsive map sizing
   const screenWidth = Dimensions.get('window').width;
   const mapWidth = Math.min(screenWidth - 32, 500); // Max 500px, with 32px padding
-  const mapHeight = Math.min((screenWidth - 32) * 0.75, 375); // 3:4 aspect ratio
+  const mapHeight = mapWidth; // Use square aspect ratio for better single state display
 
   if (!stateInfo) {
     return (
@@ -59,7 +59,10 @@ export function SenatorsView({ stateCode }: SenatorsViewProps) {
     <ScrollView className="flex-1 bg-white">
       <View className="items-center justify-center p-6">
         {/* State Outline Map - using existing USAMap component */}
-        <View className="mb-6">
+        <View
+          className="mb-6 border border-gray-200 rounded-lg overflow-hidden"
+          style={{ width: mapWidth, height: mapHeight }}
+        >
           <USAMap width={mapWidth} height={mapHeight} filterStateCode={stateCode} />
         </View>
 

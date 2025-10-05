@@ -5,7 +5,7 @@
 ### ✅ Home Screen (USA Map)
 1. **Tap small state (Rhode Island, Delaware, Connecticut)**
    - Should navigate to state detail page
-   - Should happen on quick tap without movement
+   - Normal tap - no need to be super precise
    
 2. **Pinch to zoom**
    - Pinch out → Zoom in (up to 5x)
@@ -13,12 +13,23 @@
    
 3. **Pan when zoomed**
    - Zoom in first
-   - Drag finger > 10px → Map should move
-   - Quick tap < 10px → Should still click state
+   - Drag finger > 20px → Map should move
+   - Normal tap < 20px → Should still click state
 
 4. **Zoom then tap small state**
    - Zoom in to 2x-3x
    - Tap Rhode Island → Should navigate to /ri
+
+### Touch Target Improvements
+- **20px minimum distance** for pan (increased from 10px)
+  - More forgiving for normal taps
+  - Still allows pan when you drag
+- **Invisible 30px stroke** around each state (increased from 15px)
+  - Much easier to tap small states (Delaware, Hawaii, Rhode Island)
+  - Larger "hit area" than visible border
+- **Pan bounds** to prevent covering UI elements
+  - Map stays within viewport when not zoomed
+  - Proportional panning allowed when zoomed in
 
 ### ✅ State Detail Page (e.g., /ohio, /texas)
 1. **Map fits on screen**
@@ -65,10 +76,16 @@ npx expo start --clear
 #### Test 2: Pan vs Tap Distinction
 ```
 1. Open app
-2. Quickly tap any state (< 10px movement)
+2. Quickly tap any state (< 20px movement)
    ✅ Should navigate immediately
-3. Touch and drag > 10px
+3. Drag finger > 20px
    ✅ Should pan the map (not navigate)
+4. Pan boundary check
+   - Try panning when NOT zoomed
+   ✅ Map should stay within viewport bounds
+   - Zoom in to 3x
+   - Try panning
+   ✅ Should allow proportional panning based on zoom level
 ```
 
 #### Test 3: State Detail Map Sizing
@@ -80,24 +97,25 @@ npx expo start --clear
 3. Pinch to zoom
    ✅ Should zoom smoothly
 4. Drag map
-   ✅ Should pan when > 10px movement
+   ✅ Should pan when > 20px movement
+   ✅ Should respect bounds (not cover UI text)
 ```
 
 ## Expected Behavior
 
 ### Touch Interaction Flow
 ```
-Touch Down → Move < 10px → Touch Up
+Touch Down → Move < 20px → Touch Up
   ↓
-  SVG Path onPress fires
+  SVG Path onPress fires (invisible overlay with 30px stroke)
   ↓
   Navigate to state detail page
 
-Touch Down → Move > 10px → Continue dragging
+Touch Down → Move > 20px → Continue dragging
   ↓
   Pan gesture activates
   ↓
-  Map moves around (no navigation)
+  Map moves within bounds (no navigation)
 ```
 
 ### Zoom Behavior
@@ -117,9 +135,18 @@ Two fingers touch → Pinch inward
 
 ## Common Issues & Solutions
 
-### Issue: "State still not clickable after zoom"
+### Issue: "Delaware/Hawaii still not clickable"
 **Check**: 
-- Are you tapping quickly (< 10px movement)?
+- Are you tapping quickly (< 20px movement)?
+- Try zooming in first, then tapping
+- Invisible 30px stroke should make it much easier
+**Solution**: Zoom to 2x-3x, then tap the center of the state
+
+### Issue: "Map pans over the text/buttons"
+**Check**:
+- Are you zoomed out to 1x? Map should NOT pan much when not zoomed
+- Pan bounds: Map locked to viewport when scale = 1x
+**Solution**: This is now fixed with pan bounds. When not zoomed, map stays in place. When zoomed, allows proportional panning based on zoom level.
 - Or are you accidentally dragging slightly?
 
 **Fix**: Make very quick, sharp taps without finger movement

@@ -23,16 +23,27 @@
 **Solution**:
 ```typescript
 const panGesture = Gesture.Pan()
-  .minDistance(10) // Require 10px movement before activating
-  .onUpdate(...)
+  .minDistance(20) // Require 20px movement before activating (increased for better tap detection)
+  .onUpdate((event) => {
+    const newX = savedTranslateX.value + event.translationX;
+    const newY = savedTranslateY.value + event.translationY;
+    
+    // Calculate bounds to prevent panning over UI elements
+    const maxPan = (scale.value - 1) * 200;
+    
+    // Clamp translation to keep map within viewport
+    translateX.value = Math.max(-maxPan, Math.min(maxPan, newX));
+    translateY.value = Math.max(-maxPan, Math.min(maxPan, newY));
+  })
 ```
 
 This allows:
-- Quick taps (< 10px movement) → Go through to Path onPress → Navigate to state
-- Drag gestures (> 10px movement) → Activate pan → Move map around
+- Quick taps (< 20px movement) → Go through to Path onPress → Navigate to state
+- Drag gestures (> 20px movement) → Activate pan → Move map (with bounds)
+- Pan bounds prevent map from covering text/buttons
 
 ### Issue 3: Small States Still Hard to Tap
-**Problem**: Users could only click on larger states like Texas and California. Small states (Rhode Island, Delaware, etc.) were too small to tap accurately on mobile.
+**Problem**: Users could only click on larger states like Texas and California. Small states (Rhode Island, Delaware, Hawaii) were too small to tap accurately on mobile.
 
 **Root Cause**: 
 - SVG Path elements had no expanded touch targets
@@ -41,10 +52,27 @@ This allows:
 
 **Solution**:
 - Installed `react-native-gesture-handler` for better touch handling
+- Added **30px invisible stroke** overlay for much larger touch targets
 - Added pinch-to-zoom capability so users can zoom in on small states
 - Pan gesture allows navigation across the zoomed map
 
-### 2. Large States Not Fitting on Screen (State Detail Pages)
+### Issue 4: Single State Map Not Showing Correctly (Senator View)
+**Problem**: When filtering to show a single state in SenatorsView, the state was cut off or didn't display properly.
+
+**Root Cause**:
+- Variable name collision (`width`/`height` used as both props and local variables)
+- Aspect ratio mismatch between calculated viewBox and container
+- Missing `preserveAspectRatio` attribute on SVG
+- Insufficient padding around single state bounds
+
+**Solution**:
+- Renamed local variables to `boundsWidth`/`boundsHeight` to avoid conflicts
+- Increased padding from 10% to 20% for better single state visibility
+- Added `preserveAspectRatio="xMidYMid meet"` to SVG to maintain aspect ratio
+- Changed SenatorsView to use square aspect ratio (width = height) for consistent display
+- Added border container to visualize map boundaries
+
+### 5. Large States Not Fitting on Screen (State Detail Pages)
 **Problem**: On state detail pages, large states (Texas, California, Alaska) didn't fit properly in the representative views on mobile screens.
 
 **Root Cause**:

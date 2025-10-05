@@ -91,10 +91,18 @@ export function DistrictMap({ stateCode, width, height }: DistrictMapProps) {
 
   // Pan gesture for dragging - only activate after minimum distance
   const panGesture = Gesture.Pan()
-    .minDistance(10) // Require 10px movement before activating pan
+    .minDistance(20) // Require 20px movement before activating pan (increased from 10 for better tap detection)
     .onUpdate((event) => {
-      panX.value = savedPanX.value + event.translationX;
-      panY.value = savedPanY.value + event.translationY;
+      const newX = savedPanX.value + event.translationX;
+      const newY = savedPanY.value + event.translationY;
+
+      // Calculate bounds based on current scale
+      // When zoomed in, allow more panning; when zoomed out, restrict panning
+      const maxPan = (zoomScale.value - 1) * 200; // Allow more panning when zoomed in
+
+      // Clamp translation to prevent panning too far off screen
+      panX.value = Math.max(-maxPan, Math.min(maxPan, newX));
+      panY.value = Math.max(-maxPan, Math.min(maxPan, newY));
     })
     .onEnd(() => {
       savedPanX.value = panX.value;
