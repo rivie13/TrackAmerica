@@ -65,9 +65,7 @@ export function SenatorsView({ stateCode }: SenatorsViewProps) {
 
         {/* Placeholder Content */}
         <View className="bg-gray-50 rounded-lg p-6 max-w-md">
-          <Text className="text-gray-700 text-center mb-4">
-            Senator information coming soon
-          </Text>
+          <Text className="text-gray-700 text-center mb-4">Senator information coming soon</Text>
 
           <Text className="text-gray-600 text-sm mb-2">Future enhancements:</Text>
           <Text className="text-gray-600 text-sm">• Senator names and party affiliation</Text>

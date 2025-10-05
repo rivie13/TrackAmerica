@@ -67,11 +67,11 @@ export function DistrictMap({ stateCode, width = 400, height = 300 }: DistrictMa
       try {
         // In Expo web, we need to fetch the asset from the Metro server
         const topoAsset = require('@/assets/maps/districts/us-congressional-districts-119.topojson');
-        
+
         // For web: fetch the actual file content
         // For native: the require() already gives us the parsed JSON
         let topoData: Topology;
-        
+
         if (typeof topoAsset === 'number') {
           // Native: asset is a number ID, need to resolve it
           const Asset = require('expo-asset').Asset;
@@ -87,7 +87,7 @@ export function DistrictMap({ stateCode, width = 400, height = 300 }: DistrictMa
           // Already parsed JSON object
           topoData = topoAsset;
         }
-        
+
         setTopology(topoData);
         setLoading(false);
       } catch (err) {

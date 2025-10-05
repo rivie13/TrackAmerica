@@ -56,14 +56,17 @@ export default function USAMap({ className, width, height = 500, filterStateCode
 
   // Calculate bounds for filtered state to zoom in properly
   let viewBox = '0 0 975 610';
-  
+
   if (filterStateCode && features.length > 0) {
     // Calculate bounding box for the state
-    let minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity;
-    
+    let minX = Infinity,
+      minY = Infinity,
+      maxX = -Infinity,
+      maxY = -Infinity;
+
     features.forEach((feature: any) => {
       const coords = feature.geometry.coordinates;
-      
+
       const processCoords = (coordArray: any) => {
         if (typeof coordArray[0] === 'number') {
           // This is a coordinate pair
@@ -76,21 +79,21 @@ export default function USAMap({ className, width, height = 500, filterStateCode
           coordArray.forEach(processCoords);
         }
       };
-      
+
       processCoords(coords);
     });
-    
+
     // Add padding (10% on each side)
     const width = maxX - minX;
     const height = maxY - minY;
     const paddingX = width * 0.1;
     const paddingY = height * 0.1;
-    
+
     minX -= paddingX;
     maxX += paddingX;
     minY -= paddingY;
     maxY += paddingY;
-    
+
     viewBox = `${minX} ${minY} ${maxX - minX} ${maxY - minY}`;
   }
 
