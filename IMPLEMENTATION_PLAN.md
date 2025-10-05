@@ -27,15 +27,15 @@
 
 ### **Phase 1: Setup & Basic UI (Week 1-2)**
 
-#### Week 1: Project Setup
-- [ ] Install Node.js (if not already installed)
-- [ ] Create Expo app: `npx create-expo-app@latest trackamerica`
-- [ ] Set up Expo Router (file-based routing)
-- [ ] Install NativeWind for styling
-- [ ] Set up TypeScript
-- [ ] Create basic folder structure
-- [ ] Initialize Git repository
-- [ ] Create `.env` file for secrets
+#### Week 1: Project Setup ✅ COMPLETE
+- [x] Install Node.js (if not already installed)
+- [x] Create Expo app: `npx create-expo-app@latest trackamerica`
+- [x] Set up Expo Router (file-based routing)
+- [x] Install NativeWind for styling
+- [x] Set up TypeScript
+- [x] Create basic folder structure
+- [x] Initialize Git repository
+- [x] Create `.env` file for secrets
 
 **Folder Structure:**
 ```
@@ -284,15 +284,16 @@ model Vote {
 
 ## 🎯 Weekly Milestones
 
-| Week | Milestone | What Users Can Do |
-|------|-----------|-------------------|
-| 1-2  | Interactive Map | Click states |
-| 3-4  | Representatives | See their senators & house members |
-| 5-6  | Database & API | Faster loading (cached data) |
-| 7-8  | Voting Records | See how reps voted on bills |
-| 9-10 | AI Chatbot | Ask questions about bills |
-| 11   | Polish | Beautiful, smooth experience |
-| 12   | Deploy | Use it from anywhere! |
+| Week | Milestone | What Users Can Do | Status |
+|------|-----------|-------------------|--------|
+| 1    | Project Setup | N/A (infrastructure) | ✅ COMPLETE |
+| 2    | Interactive Map | Click states | 🚧 IN PROGRESS |
+| 3-4  | Representatives | See their senators & house members | ⏳ PLANNED |
+| 5-6  | Database & API | Faster loading (cached data) | ⏳ PLANNED |
+| 7-8  | Voting Records | See how reps voted on bills | ⏳ PLANNED |
+| 9-10 | AI Chatbot | Ask questions about bills | ⏳ PLANNED |
+| 11   | Polish | Beautiful, smooth experience | ⏳ PLANNED |
+| 12   | Deploy | Use it from anywhere! | ⏳ PLANNED |
 
 ---
 
