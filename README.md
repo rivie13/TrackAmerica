@@ -53,6 +53,8 @@
 
    npx expo start --tunnel can be used to allow mobile devices to connect when on hotel or public Wi-Fi networks.
 
+   if  you have an android emulator or ios simulator set up, you can run the app directly on them using the commands below also if you use npx expo start, you can press 'a' for android and 'i' for ios simulators from the terminal when the emulator is running or use commands below.
+
    **Frontend (Expo):**
    ```bash
    npm start          # Start Expo dev server
