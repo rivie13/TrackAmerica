@@ -3,9 +3,14 @@
 export { PageTitle } from './ui/PageTitle';
 export { Subtitle } from './ui/Subtitle';
 export { StatusCard } from './ui/StatusCard';
+export { ViewSelector } from './ui/ViewSelector';
 
-// Map Components (USA map and state selection)
-// export { USAMap } from './map/USAMap';
+// Map Components (USA map and district map rendering)
+export { default as USAMap } from './map/USAMap';
+export { DistrictMap } from './map/DistrictMap';
+
+// View Components (state detail page views)
+export { DistrictsView, SenatorsView } from './views';
 
 // Representative Components (rep cards, vote records)
 // export { RepCard } from './representatives/RepCard';

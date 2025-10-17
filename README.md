@@ -47,6 +47,12 @@
 
 4. **Start the development servers**
    
+   You may need to run npm install expo to install expo and project packages properlly.
+
+   Then, npx expo start will start the Expo development server for the frontend, and npm run api will start the Express backend server.
+
+   npx expo start --tunnel can be used to allow mobile devices to connect when on hotel or public Wi-Fi networks.
+
    **Frontend (Expo):**
    ```bash
    npm start          # Start Expo dev server
