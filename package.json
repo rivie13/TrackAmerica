@@ -34,12 +34,16 @@
     "url": "https://github.com/rivie13/TrackAmerica/issues"
   },
   "homepage": "https://github.com/rivie13/TrackAmerica#readme",
+  "overrides": {
+    "d3-color": "^3.1.0"
+  },
   "dependencies": {
     "@prisma/client": "^6.16.3",
     "axios": "^1.12.2",
     "cors": "^2.8.5",
     "dotenv": "^17.2.3",
-    "expo": "^54.0.12",
+    "expo": "^54.0.13",
+    "expo-asset": "^12.0.9",
     "expo-constants": "~18.0.9",
     "expo-linking": "~8.0.8",
     "expo-router": "~6.0.10",
@@ -52,10 +56,14 @@
     "react": "19.1.0",
     "react-dom": "19.1.0",
     "react-native": "^0.81.4",
+    "react-native-gesture-handler": "~2.28.0",
     "react-native-reanimated": "~4.1.1",
     "react-native-safe-area-context": "~5.6.0",
     "react-native-screens": "~4.16.0",
-    "react-native-web": "^0.21.0"
+    "react-native-svg": "15.12.1",
+    "react-native-web": "^0.21.0",
+    "react-native-worklets": "0.5.1",
+    "topojson-client": "^3.1.0"
   },
   "devDependencies": {
     "@commitlint/cli": "^20.1.0",
@@ -65,6 +73,8 @@
     "@types/node": "^24.6.2",
     "@types/react": "~19.1.10",
     "@types/react-native": "~0.72.8",
+    "@types/topojson-client": "^3.1.5",
+    "@types/topojson-specification": "^1.0.5",
     "@typescript-eslint/eslint-plugin": "^8.45.0",
     "@typescript-eslint/parser": "^8.45.0",
     "autoprefixer": "^10.4.21",
@@ -75,10 +85,12 @@
     "eslint-plugin-react-hooks": "^6.1.0",
     "eslint-plugin-react-native": "^5.0.0",
     "husky": "^9.1.7",
+    "mapshaper": "^0.6.113",
     "nodemon": "^3.1.10",
     "postcss": "^8.5.6",
     "prettier": "^3.6.2",
     "tailwindcss": "^3.3.2",
+    "topojson": "^3.0.2",
     "ts-node": "^10.9.2",
     "typescript": "^5.9.3"
   }
