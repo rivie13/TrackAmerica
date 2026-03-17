@@ -323,7 +323,14 @@ We welcome contributions! Please read:
 
 ## 📄 License
 
-ISC
+This project is licensed under the **GNU General Public License v3.0 (GPL-3.0)**.
+
+- You are free to use, study, and contribute to this project
+- Any derivative work must also be released under GPL-3.0 (copyleft)
+- You must give credit to the original author (rivie13)
+- You cannot take this code and make it proprietary
+
+See the [LICENSE](./LICENSE) file for the full license text, or visit [https://www.gnu.org/licenses/gpl-3.0.en.html](https://www.gnu.org/licenses/gpl-3.0.en.html).
 
 ---
 

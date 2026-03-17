@@ -177,7 +177,7 @@ export default function USAMap({ className, width, height = 500, filterStateCode
   }));
 
   return (
-    <View className={className} style={{ width: mapWidth, height: mapHeight }}>
+    <View className={className} style={{ width: mapWidth, height: mapHeight, overflow: 'hidden' }}>
       <GestureDetector gesture={composedGesture}>
         <Animated.View style={[{ width: '100%', height: '100%' }, animatedStyles]}>
           <Svg width="100%" height="100%" viewBox={viewBox} preserveAspectRatio="xMidYMid meet">
