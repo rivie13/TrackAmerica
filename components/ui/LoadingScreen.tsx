@@ -39,7 +39,7 @@ export function LoadingScreen({ onFinish, minDuration = 2000 }: LoadingScreenPro
       onFinish?.();
     }, minDuration);
     return () => clearTimeout(timer);
-  }, []);
+  }, [minDuration, onFinish, pulse]);
 
   const pulseStyle = useAnimatedStyle(() => ({
     opacity: pulse.value,
