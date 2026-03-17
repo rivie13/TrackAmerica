@@ -18,7 +18,7 @@ export { DistrictMap } from './map/DistrictMap';
 export { DistrictsView, SenatorsView } from './views';
 
 // Representative Components (rep cards, vote records)
-// export { RepCard } from './representatives/RepCard';
+export { RepCard } from './representatives/RepCard';
 
 // Chat Components (AI chatbot interface)
 // export { ChatBot } from './chat/ChatBot';

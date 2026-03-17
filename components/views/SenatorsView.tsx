@@ -1,51 +1,24 @@
 /**
  * SenatorsView Component
  *
- * Displays US Senators for a specific state.
- *
- * Features (planned):
- * - State shape outline (reuse from existing states TopoJSON)
- * - Senator cards with names, party affiliation, photos
- * - Contact information (office, phone, email)
- * - Voting records and bill sponsorships
- * - Term dates and next election info
- *
- * Current implementation: Placeholder view with state district map
- * Data source (planned): Congress.gov API
+ * Displays current US Senators for a specific state using Congress.gov API.
  */
 
 import React from 'react';
-import { View, Text, ScrollView, Dimensions } from 'react-native';
+import { View, Text, ScrollView, ActivityIndicator } from 'react-native';
 
-import USAMap from '@/components/map/USAMap';
+import { RepCard } from '@/components/representatives/RepCard';
+import { useSenators } from '@/lib/hooks/useCongress';
 import { STATE_INFO } from '@/lib/data/states';
 
 interface SenatorsViewProps {
-  /**
-   * Two-letter state code (e.g., "PA" for Pennsylvania)
-   */
   stateCode: string;
 }
 
-/**
- * SenatorsView Component (Placeholder)
- *
- * Shows state district map and placeholder senator information.
- * Will display full senator data when Congress.gov API is integrated.
- *
- * @example
- * ```tsx
- * <SenatorsView stateCode="PA" />
- * ```
- */
 export function SenatorsView({ stateCode }: SenatorsViewProps) {
   const normalizedCode = stateCode.toLowerCase();
   const stateInfo = STATE_INFO[normalizedCode];
-
-  // Get screen dimensions for responsive map sizing
-  const screenWidth = Dimensions.get('window').width;
-  const mapWidth = Math.min(screenWidth - 32, 500); // Max 500px, with 32px padding
-  const mapHeight = mapWidth; // Use square aspect ratio for better single state display
+  const { data: senators, isLoading, isError, error } = useSenators(stateCode);
 
   if (!stateInfo) {
     return (
@@ -56,35 +29,49 @@ export function SenatorsView({ stateCode }: SenatorsViewProps) {
   }
 
   return (
-    <ScrollView className="flex-1 bg-white">
-      <View className="items-center justify-center p-6">
-        {/* State Outline Map - using existing USAMap component */}
-        <View
-          className="mb-6 border border-gray-200 rounded-lg overflow-hidden"
-          style={{ width: mapWidth, height: mapHeight }}
-        >
-          <USAMap width={mapWidth} height={mapHeight} filterStateCode={stateCode} />
-        </View>
+    <ScrollView className="flex-1 bg-white" contentContainerStyle={{ paddingBottom: 32 }}>
+      <View className="px-4 pt-4">
+        {/* Section header */}
+        <Text className="text-xl font-bold text-gray-900 mb-1">{stateInfo.name} Senators</Text>
+        <Text className="text-sm text-gray-500 mb-5">2 US Senators · 6-year terms</Text>
 
-        {/* Senator Information Header */}
-        <Text className="text-2xl font-bold text-gray-900 mb-4 text-center">
-          {stateInfo.name} Senators
-        </Text>
+        {/* Loading */}
+        {isLoading && (
+          <View className="items-center py-12">
+            <ActivityIndicator size="large" color="#3b82f6" />
+            <Text className="text-gray-400 text-sm mt-3">Loading senators…</Text>
+          </View>
+        )}
 
-        {/* Placeholder Content */}
-        <View className="bg-gray-50 rounded-lg p-6 max-w-md">
-          <Text className="text-gray-700 text-center mb-4">Senator information coming soon</Text>
+        {/* Error */}
+        {isError && (
+          <View className="bg-red-50 rounded-2xl p-5">
+            <Text className="text-red-700 font-semibold mb-1">Failed to load senators</Text>
+            <Text className="text-red-500 text-sm">
+              {error instanceof Error ? error.message : 'Unknown error'}
+            </Text>
+            <Text className="text-gray-400 text-xs mt-2">
+              Make sure EXPO_PUBLIC_CONGRESS_API_KEY is set in your .env file.
+            </Text>
+          </View>
+        )}
 
-          <Text className="text-gray-600 text-sm mb-2">Future enhancements:</Text>
-          <Text className="text-gray-600 text-sm">• Senator names and party affiliation</Text>
-          <Text className="text-gray-600 text-sm">• Photos and contact information</Text>
-          <Text className="text-gray-600 text-sm">• Voting records and bill sponsorships</Text>
-          <Text className="text-gray-600 text-sm">• Term dates and next election info</Text>
+        {/* Senators list */}
+        {senators &&
+          senators.length > 0 &&
+          senators.map((senator) => <RepCard key={senator.bioguideId} member={senator} />)}
 
-          <Text className="text-gray-500 text-xs mt-4 text-center">
-            Data source: Congress.gov API (planned)
-          </Text>
-        </View>
+        {/* Empty state */}
+        {senators && senators.length === 0 && (
+          <View className="items-center py-12">
+            <Text className="text-gray-400 text-base">No senators found for {stateInfo.name}</Text>
+          </View>
+        )}
+
+        {/* Attribution */}
+        {senators && (
+          <Text className="text-xs text-gray-400 text-center mt-4">Data from Congress.gov API</Text>
+        )}
       </View>
     </ScrollView>
   );
