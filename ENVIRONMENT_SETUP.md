@@ -65,7 +65,7 @@ npm --version    # Should be 9.x.x or higher
 3. Get API key instantly
 4. Add to `.env`:
    ```
-   EIA_API_KEY=your_key_here
+   EXPO_PUBLIC_EIA_API_KEY=your_key_here
    ```
 
 **Rate Limits:** Generous for development use
@@ -84,7 +84,7 @@ npm --version    # Should be 9.x.x or higher
 3. Request an API key
 4. Add to `.env`:
    ```
-   FRED_API_KEY=your_key_here
+   EXPO_PUBLIC_FRED_API_KEY=your_key_here
    ```
 
 **Rate Limits:** 120 requests per minute
