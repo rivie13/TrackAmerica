@@ -178,10 +178,12 @@ Build an **all-in-one national dashboard** (web + mobile) that shows:
 CONGRESS_API_KEY=your_key_here
 
 # EIA API - gas/energy prices (FREE)
-EIA_API_KEY=your_key_here
+# Note: Expo dashboard reads EXPO_PUBLIC_EIA_API_KEY (public, bundled into client)
+EXPO_PUBLIC_EIA_API_KEY=your_key_here
 
 # FRED API - dollar index, interest rates, economic data (FREE)
-FRED_API_KEY=your_key_here
+# Note: Expo dashboard reads EXPO_PUBLIC_FRED_API_KEY (public, bundled into client)
+EXPO_PUBLIC_FRED_API_KEY=your_key_here
 
 # Treasury FiscalData API - no key needed
 
