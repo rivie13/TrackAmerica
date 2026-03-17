@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { View, Dimensions } from 'react-native';
+import React, { useRef } from 'react';
+import { View, Dimensions, Platform } from 'react-native';
 import Svg, { Path, G } from 'react-native-svg';
 import { GestureDetector, Gesture } from 'react-native-gesture-handler';
 import Animated, { useSharedValue, useAnimatedStyle } from 'react-native-reanimated';
@@ -38,7 +38,6 @@ interface USAMapProps {
  */
 export default function USAMap({ className, width, height = 500, filterStateCode }: USAMapProps) {
   const router = useRouter();
-  const [hoveredState, setHoveredState] = useState<string | null>(null);
 
   // Zoom and pan state
   const scale = useSharedValue(1);
@@ -107,10 +106,31 @@ export default function USAMap({ className, width, height = 500, filterStateCode
     viewBox = `${minX} ${minY} ${maxX - minX} ${maxY - minY}`;
   }
 
+  // Track last tap for double-tap detection on mobile
+  const lastTapRef = useRef<{ stateId: string; time: number } | null>(null);
+
   const handleStatePress = (stateId: string) => {
     const stateInfo = getStateByFips(stateId);
     if (stateInfo) {
       router.push(`/${stateInfo.code}` as any);
+    }
+  };
+
+  const handleStateTap = (stateId: string) => {
+    if (Platform.OS === 'web') {
+      // Web: single click navigates
+      handleStatePress(stateId);
+      return;
+    }
+
+    // Mobile: require double-tap to prevent accidental selection during zoom/pan
+    const now = Date.now();
+    const lastTap = lastTapRef.current;
+    if (lastTap && lastTap.stateId === stateId && now - lastTap.time < 400) {
+      lastTapRef.current = null;
+      handleStatePress(stateId);
+    } else {
+      lastTapRef.current = { stateId, time: now };
     }
   };
 
@@ -127,14 +147,13 @@ export default function USAMap({ className, width, height = 500, filterStateCode
 
   // Pan gesture for dragging - only activate after minimum distance
   const panGesture = Gesture.Pan()
-    .minDistance(20) // Require 20px movement before activating pan (increased from 10 for better tap detection)
+    .minDistance(20) // Require 20px movement before activating pan
     .onUpdate((event) => {
       const newX = savedTranslateX.value + event.translationX;
       const newY = savedTranslateY.value + event.translationY;
 
       // Calculate bounds based on current scale
-      // When zoomed in, allow more panning; when zoomed out, restrict panning
-      const maxPan = (scale.value - 1) * 200; // Allow more panning when zoomed in
+      const maxPan = (scale.value - 1) * 200;
 
       // Clamp translation to prevent panning too far off screen
       translateX.value = Math.max(-maxPan, Math.min(maxPan, newX));
@@ -145,8 +164,7 @@ export default function USAMap({ className, width, height = 500, filterStateCode
       savedTranslateY.value = translateY.value;
     });
 
-  // Combine gestures - pinch and pan simultaneously
-  // Note: We don't add tap here because SVG Path elements handle their own onPress
+  // Combine gestures for zoom/pan (tap is handled by SVG Path onPressIn)
   const composedGesture = Gesture.Simultaneous(pinchGesture, panGesture);
 
   // Animated styles for zoom and pan
@@ -159,7 +177,7 @@ export default function USAMap({ className, width, height = 500, filterStateCode
   }));
 
   return (
-    <View className={className} style={{ width: mapWidth, height: mapHeight }}>
+    <View className={className} style={{ width: mapWidth, height: mapHeight, overflow: 'hidden' }}>
       <GestureDetector gesture={composedGesture}>
         <Animated.View style={[{ width: '100%', height: '100%' }, animatedStyles]}>
           <Svg width="100%" height="100%" viewBox={viewBox} preserveAspectRatio="xMidYMid meet">
@@ -167,7 +185,6 @@ export default function USAMap({ className, width, height = 500, filterStateCode
               {features.map((feature: any) => {
                 const stateId = feature.id;
                 const stateInfo = getStateByFips(stateId);
-                const isHovered = hoveredState === stateId;
                 const pathData = geoPath(feature.geometry);
 
                 // Get colors based on political leaning
@@ -176,26 +193,18 @@ export default function USAMap({ className, width, height = 500, filterStateCode
                   : { fill: '#d6d6da', stroke: '#ffffff' };
 
                 return (
-                  <G key={stateId}>
-                    {/* Invisible larger hit area for easier tapping */}
-                    <Path
-                      d={pathData}
-                      fill="transparent"
-                      stroke="transparent"
-                      strokeWidth={30} // Large invisible stroke for better touch target (increased from 15)
-                      onPress={() => handleStatePress(stateId)}
-                      onPressIn={() => setHoveredState(stateId)}
-                      onPressOut={() => setHoveredState(null)}
-                    />
-                    {/* Visible state path */}
-                    <Path
-                      d={pathData}
-                      fill={isHovered ? '#60a5fa' : colors.fill}
-                      stroke={colors.stroke}
-                      strokeWidth={2}
-                      pointerEvents="none" // Let the invisible overlay handle touches
-                    />
-                  </G>
+                  <Path
+                    key={stateId}
+                    d={pathData}
+                    fill={colors.fill}
+                    stroke={colors.stroke}
+                    strokeWidth={2}
+                    // Web: single click selects state
+                    // Mobile: onPressIn with double-tap detection to avoid accidental taps during zoom
+                    {...(Platform.OS === 'web'
+                      ? { onPress: () => handleStateTap(stateId) }
+                      : { onPressIn: () => handleStateTap(stateId) })}
+                  />
                 );
               })}
             </G>

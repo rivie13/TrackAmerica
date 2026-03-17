@@ -4,6 +4,8 @@ export { PageTitle } from './ui/PageTitle';
 export { Subtitle } from './ui/Subtitle';
 export { StatusCard } from './ui/StatusCard';
 export { ViewSelector } from './ui/ViewSelector';
+export { StateSearch } from './ui/StateSearch';
+export { SmallStateButtons } from './ui/SmallStateButtons';
 
 // Map Components (USA map and district map rendering)
 export { default as USAMap } from './map/USAMap';
