@@ -1,10 +1,5 @@
 import React, { useState, useMemo } from 'react';
-import {
-  View,
-  TextInput,
-  Pressable,
-  Text,
-} from 'react-native';
+import { View, TextInput, Pressable, Text } from 'react-native';
 import { useRouter } from 'expo-router';
 import { STATE_INFO } from '@/lib/data/states';
 
@@ -97,11 +92,7 @@ export function StateSearch({ className }: StateSearchProps) {
             editable={true}
           />
           {searchText.length > 0 && (
-            <Pressable
-              onPress={handleClearSearch}
-              hitSlop={10}
-              className="ml-2"
-            >
+            <Pressable onPress={handleClearSearch} hitSlop={10} className="ml-2">
               <Text className="text-gray-400 text-lg">✕</Text>
             </Pressable>
           )}
@@ -124,12 +115,8 @@ export function StateSearch({ className }: StateSearchProps) {
               >
                 {({ pressed }) => (
                   <View style={{ backgroundColor: pressed ? '#f3f4f6' : 'transparent' }}>
-                    <Text className="text-base text-gray-900">
-                      {item.displayName}
-                    </Text>
-                    <Text className="text-sm text-gray-500 mt-1">
-                      {item.code.toUpperCase()}
-                    </Text>
+                    <Text className="text-base text-gray-900">{item.displayName}</Text>
+                    <Text className="text-sm text-gray-500 mt-1">{item.code.toUpperCase()}</Text>
                   </View>
                 )}
               </Pressable>

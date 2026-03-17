@@ -1,25 +1,33 @@
-# TrackAmerica.com - Simple Implementation Plan
+# TrackAmerica.com - Implementation Plan
 
-**Last Updated:** September 30, 2025  
+**Last Updated:** March 16, 2026
 **Philosophy:** KISS - Keep It Simple, Stupid
+**Focus:** Federal level only (state/local later)
 
 ---
 
-## 🎯 Simple Feature List (MVP)
+## Vision
 
-### Core Features Only:
-1. ✅ **Interactive USA Map** - Click a state to see its representatives
-2. ✅ **Representatives List** - Show 2 Senators + House members per state
-3. ✅ **Voting Records** - Display how each rep voted on recent bills
-4. ✅ **AI Chatbot UI** - Simple chat interface (wire up AI later)
+TrackAmerica is an **all-in-one, non-biased national dashboard**. Open data on the economy, government approval, national debt, AND congressional accountability. The app you open to get a quick, honest snapshot of how the country is doing.
+
+---
+
+## Feature List (MVP)
+
+### Core Features:
+1. **National Dashboard** - Key indicators: gas prices, dollar value, interest rates, debt, approval ratings with trend data
+2. **Interactive USA Map** - Click a state to see its representatives
+3. **Representatives List** - Show 2 Senators + House members per state
+4. **Voting Records** - Display how each rep voted on recent bills
+5. **AI Bill Q&A** - Ask questions about bills, get answers backed by source text
+6. **Buy Me a Coffee** - Donation support link
 
 ### What We're NOT Building Yet:
-- ❌ User accounts / login
-- ❌ Notifications
-- ❌ Advanced animations
-- ❌ Social features
-- ❌ Payment/donations
-- ❌ User profiles
+- State/local government tracking (later phases)
+- User accounts / login
+- Notifications
+- Social features
+- User profiles
 
 ---
 
@@ -87,213 +95,97 @@ trackamerica/
 
 ---
 
-### **Phase 2: Congress Data & Representatives (Week 3-4)**
+### **Phase 2: National Dashboard + Data APIs**
 
-#### Week 3: Congress.gov API Integration
-- [ ] Sign up for Congress.gov API key (free)
-- [ ] Create API client functions:
-  - `getRepsByState(stateCode)`
-  - `getBillInfo(billId)`
-  - `getVotesByMember(bioguideId)`
-- [ ] Test API calls with Postman
-- [ ] Handle API rate limiting
-- [ ] Add loading states in UI
+#### National Indicators (Home Screen)
 
-#### Week 4: Display Representatives
-- [ ] Build state detail page
-- [ ] Show 2 Senators for selected state
-- [ ] Show House representatives for selected state
-- [ ] Display basic info: name, party, photo (if available)
-- [ ] Style representative cards
-- [ ] Add "View Voting Record" button
+All data from free, open government APIs:
 
-**Deliverable:** Click California → see Senators + House members
+- **Avg gas price (national)** — EIA API (api.eia.gov), trends over 3/6/9/12 months
+- **US Dollar valuation (DXY index)** — FRED API (fred.stlouisfed.org), trends over 1/5/10 years
+- **Interest rates (Treasury bonds)** — FRED API, trends over 6mo/1/3/5 years
+- **National debt** — Treasury FiscalData API (fiscaldata.treasury.gov), rate of increase over 1/5/10/20 years
+- **Congress approval rating** — RealClearPolitics/Gallup data, trends over 6mo/1/3/5 years
+- **Presidential approval rating** — RealClearPolitics/Gallup data, trends over 6mo/1/3/5 years
+- **Supreme Court approval** — Gallup/Pew data, trends over 6mo/1/3/5 years
 
----
+Tasks:
+- [ ] Sign up for EIA API key (free)
+- [ ] Sign up for FRED API key (free)
+- [ ] Install @tanstack/react-query for data fetching/caching
+- [ ] Create API service modules: `lib/services/economic.ts`, `lib/services/approval.ts`
+- [ ] Create TanStack Query hooks: `lib/hooks/useNationalData.ts`
+- [ ] Build IndicatorCard component (value + trend arrow + % change)
+- [ ] Build NationalDashboard component (grid of IndicatorCards)
+- [ ] Integrate dashboard into home screen above/below the map
 
-### **Phase 3: Database Setup (Week 5-6)**
-
-#### Week 5: PostgreSQL Setup
-- [ ] Install Docker Desktop (easiest way)
-- [ ] Run PostgreSQL in Docker:
-  ```bash
-  docker run --name trackamerica-db -e POSTGRES_PASSWORD=password -p 5432:5432 -d postgres
-  ```
-- [ ] Install Prisma: `npm install prisma @prisma/client`
-- [ ] Initialize Prisma: `npx prisma init`
-- [ ] Create database schema (see below)
-- [ ] Run migration: `npx prisma migrate dev`
-
-**Database Schema (Prisma):**
-```prisma
-// prisma/schema.prisma
-
-model Representative {
-  id          String   @id @default(uuid())
-  bioguideId  String   @unique
-  firstName   String
-  lastName    String
-  party       String
-  state       String
-  chamber     String   // "Senate" or "House"
-  district    String?  // Only for House members
-  photoUrl    String?
-  createdAt   DateTime @default(now())
-  votes       Vote[]
-}
-
-model Bill {
-  id          String   @id @default(uuid())
-  billNumber  String   @unique
-  title       String
-  sponsor     String?
-  congress    Int
-  introducedDate DateTime?
-  summary     String?
-  createdAt   DateTime @default(now())
-  votes       Vote[]
-}
-
-model Vote {
-  id          String   @id @default(uuid())
-  repId       String
-  billId      String
-  voteValue   String   // "Yea", "Nay", "Present", "Not Voting"
-  voteDate    DateTime
-  createdAt   DateTime @default(now())
-  
-  representative Representative @relation(fields: [repId], references: [id])
-  bill           Bill           @relation(fields: [billId], references: [id])
-}
-```
-
-#### Week 6: Backend API Setup
-- [ ] Create Express.js server (in `/api` folder)
-- [ ] Set up CORS for Expo app
-- [ ] Create endpoints:
-  - `GET /api/representatives/:state`
-  - `GET /api/bills/:billId`
-  - `GET /api/votes/:repId`
-- [ ] Add caching logic (check DB first, then Congress.gov API)
-- [ ] Test endpoints with Postman
-
-**Deliverable:** Working backend API that caches Congress data
+**Deliverable:** Open the app and instantly see how the country is doing
 
 ---
 
-### **Phase 4: Voting Records Display (Week 7-8)**
+### **Phase 3: Congress.gov API + Representatives**
 
-#### Week 7: Fetch & Display Votes
-- [ ] Create voting records page
-- [ ] Fetch recent votes for a representative
-- [ ] Display in simple list:
-  - Bill number & title
-  - How rep voted (Yea/Nay/etc)
-  - Vote date
-- [ ] Add filters (optional): by year, by topic
-- [ ] Make bill titles clickable → bill detail page
+- [ ] Create API client: `lib/services/congress.ts`
+- [ ] Create TanStack Query hooks: `lib/hooks/useCongress.ts`
+- [ ] Build RepCard component (photo, name, party, district)
+- [ ] Update SenatorsView with real senator data
+- [ ] Update DistrictsView with real house rep data
+- [ ] Build representative detail screen (`app/(states)/rep/[bioguideId].tsx`)
+- [ ] Show bio, contact info, recent votes, sponsored legislation
 
-#### Week 8: Bill Detail Page
-- [ ] Create bill detail page
-- [ ] Show bill metadata: title, sponsor, date
-- [ ] Show bill summary (from Congress.gov)
-- [ ] Show all votes on this bill
-- [ ] Link to full text on Congress.gov
-- [ ] Add "Ask AI about this bill" button (UI only)
+**Deliverable:** Click California -> see real Senators + House members
+
+---
+
+### **Phase 4: Voting Records & Bills**
+
+- [ ] Build VoteCard component (bill name, date, yea/nay)
+- [ ] Add voting record section to rep detail page
+- [ ] Build bill detail page (`app/bill/[congress]/[type]/[number].tsx`)
+- [ ] Show bill metadata, summary, sponsor, votes
+- [ ] Add "Recent Congressional Activity" feed on home screen
 
 **Deliverable:** Users can browse voting records and bill details
 
 ---
 
-### **Phase 5: AI Chatbot Setup (Week 9-10)**
+### **Phase 5: AI Bill Q&A**
 
-#### Week 9: pgvector & Embeddings
-- [ ] Enable pgvector in PostgreSQL:
-  ```sql
-  CREATE EXTENSION vector;
-  ```
-- [ ] Add bill chunks table to Prisma schema:
-  ```prisma
-  model BillChunk {
-    id        String   @id @default(uuid())
-    billId    String
-    chunkText String   @db.Text
-    embedding Unsupported("vector(1536)")?
-    createdAt DateTime @default(now())
-  }
-  ```
-- [ ] Sign up for Azure OpenAI
-- [ ] Create function to chunk bill text (500 words per chunk)
-- [ ] Create embeddings for chunks using Azure OpenAI
-- [ ] Store embeddings in PostgreSQL
-
-#### Week 10: Connect Chatbot
+- [ ] Set up AI service (Azure OpenAI or similar)
 - [ ] Build chatbot UI component
-- [ ] Create chatbot API endpoint: `POST /api/chat`
-- [ ] Implement RAG (Retrieval-Augmented Generation):
-  1. User asks question
-  2. Convert question to embedding
-  3. Search pgvector for similar bill chunks
-  4. Send question + relevant chunks to Azure OpenAI
-  5. Return AI response
-- [ ] Add chat history (local storage only)
-- [ ] Style chatbot interface
+- [ ] Implement RAG: chunk bill text, create embeddings, semantic search
+- [ ] Create chat API endpoint
+- [ ] Add chat history (local storage)
 
 **Deliverable:** Working AI chatbot that answers bill questions
 
 ---
 
-### **Phase 6: Polish & Test (Week 11)**
+### **Phase 6: Polish, Buy Me a Coffee & Deploy**
 
-#### Week 11: UI/UX Polish
-- [ ] Add loading spinners
-- [ ] Add error messages
-- [ ] Improve styling (colors, spacing, fonts)
+- [ ] Fix touch detection (onPressIn for SVG paths)
+- [ ] Add loading skeletons and error states
 - [ ] Add dark mode support
-- [ ] Test on different screen sizes
-- [ ] Test on iOS (if you have Mac/iPhone)
-- [ ] Test on Android (Expo Go or emulator)
-- [ ] Fix bugs
-
-**Optional Enhancements:**
-- [ ] Add basic animations (fade in/out)
-- [ ] Add search bar (search reps by name)
-- [ ] Add share button (share bill links)
-- [ ] Save last viewed state (AsyncStorage)
-
----
-
-### **Phase 7: Deploy (Week 12)**
-
-#### Week 12: Deployment
-- [ ] Deploy backend API to Azure App Service
-- [ ] Deploy PostgreSQL to Azure Database
-- [ ] Update environment variables in Azure
-- [ ] Deploy web app to Azure Static Web Apps
-- [ ] Test production deployment
+- [ ] Add "Buy Me a Coffee" link (buymeacoffee.com) in footer/settings
+- [ ] Deploy web to Vercel/Netlify
 - [ ] Buy domain: trackamerica.com
-- [ ] Point domain to Azure
-- [ ] Build mobile apps:
-  - iOS: `eas build --platform ios`
-  - Android: `eas build --platform android`
-- [ ] Submit to App Stores (optional for now)
+- [ ] Build mobile apps with EAS Build
+- [ ] Submit to App Stores
 
-**Deliverable:** Live website + working mobile apps! 🚀
+**Deliverable:** Live website + working mobile apps
 
 ---
 
-## 🎯 Weekly Milestones
+## Milestones
 
-| Week | Milestone | What Users Can Do | Status |
-|------|-----------|-------------------|--------|
-| 1    | Project Setup | N/A (infrastructure) | ✅ COMPLETE |
-| 2    | Interactive Map | Click states | 🚧 IN PROGRESS |
-| 3-4  | Representatives | See their senators & house members | ⏳ PLANNED |
-| 5-6  | Database & API | Faster loading (cached data) | ⏳ PLANNED |
-| 7-8  | Voting Records | See how reps voted on bills | ⏳ PLANNED |
-| 9-10 | AI Chatbot | Ask questions about bills | ⏳ PLANNED |
-| 11   | Polish | Beautiful, smooth experience | ⏳ PLANNED |
-| 12   | Deploy | Use it from anywhere! | ⏳ PLANNED |
+| Phase | Milestone | What Users Can Do | Status |
+|-------|-----------|-------------------|--------|
+| 1 | Project Setup + Map | Click states on interactive map | ✅ COMPLETE |
+| 2 | National Dashboard | See gas prices, dollar value, debt, approval ratings | ⏳ PLANNED |
+| 3 | Representatives | See their senators & house members with real data | ⏳ PLANNED |
+| 4 | Voting Records | See how reps voted on bills | ⏳ PLANNED |
+| 5 | AI Bill Q&A | Ask questions about bills | ⏳ PLANNED |
+| 6 | Polish & Deploy | Use it from anywhere + donate via Buy Me a Coffee | ⏳ PLANNED |
 
 ---
 
@@ -417,17 +309,19 @@ Then open the app on your phone using Expo Go or in a web browser!
 
 ---
 
-## ✅ Success Criteria
+## Success Criteria
 
 You'll know you're done when:
 
-1. ✅ Users can click any US state on a map
-2. ✅ They see that state's senators and house representatives
-3. ✅ They can view how each rep voted on recent bills
-4. ✅ They can click a bill to see details
-5. ✅ They can ask the AI chatbot questions about bills
-6. ✅ Everything works on web, iOS, and Android
-7. ✅ The app is live on trackamerica.com
+1. Users open the app and see a national dashboard (gas, dollar, rates, debt, approvals)
+2. Users can click any US state on the map
+3. They see that state's senators and house representatives with real data
+4. They can view how each rep voted on recent bills
+5. They can click a bill to see details
+6. They can ask AI questions about bills
+7. Everything works on web, iOS, and Android
+8. The app is live on trackamerica.com
+9. Buy Me a Coffee link is available for supporters
 
 ---
 

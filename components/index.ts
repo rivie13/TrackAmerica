@@ -7,6 +7,9 @@ export { ViewSelector } from './ui/ViewSelector';
 export { StateSearch } from './ui/StateSearch';
 export { SmallStateButtons } from './ui/SmallStateButtons';
 
+// Dashboard Components (national indicators)
+export { NationalDashboard, IndicatorCard } from './dashboard';
+
 // Map Components (USA map and district map rendering)
 export { default as USAMap } from './map/USAMap';
 export { DistrictMap } from './map/DistrictMap';

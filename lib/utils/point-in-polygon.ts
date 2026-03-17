@@ -58,10 +58,7 @@ function rayCastingAlgorithm(point: Coordinate, polygon: Coordinate[]): boolean 
  * @param coordinates - Raw geometry coordinates from GeoJSON
  * @returns Array of polygon coordinate arrays
  */
-function flattenCoordinates(
-  coordinates: any[],
-  depth: number = 0
-): Coordinate[][] {
+function flattenCoordinates(coordinates: any[], depth: number = 0): Coordinate[][] {
   // If this is a point, return empty
   if (coordinates.length === 0) return [];
 
@@ -212,9 +209,7 @@ export function testPointInPolygon() {
     const result = rayCastingAlgorithm(testCase.point, square);
     const success = result === testCase.expected;
     if (success) passed++;
-    console.log(
-      `[${success ? '✓' : '✗'}] Point ${testCase.label}: ${testCase.point} -> ${result}`
-    );
+    console.log(`[${success ? '✓' : '✗'}] Point ${testCase.label}: ${testCase.point} -> ${result}`);
   }
 
   return passed === testCases.length;

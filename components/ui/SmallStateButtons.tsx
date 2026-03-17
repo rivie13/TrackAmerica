@@ -1,10 +1,5 @@
 import React from 'react';
-import {
-  View,
-  Pressable,
-  Text,
-  ScrollView,
-} from 'react-native';
+import { View, Pressable, Text, ScrollView } from 'react-native';
 import { useRouter } from 'expo-router';
 import { getStateInfo } from '@/lib/data/states';
 
@@ -86,10 +81,7 @@ export function SmallStateButtons({ className }: SmallStateButtonsProps) {
                   >
                     {stateCode.toUpperCase()}
                   </Text>
-                  <Text
-                    style={{ color: pressed ? '#ffffff' : '#6b7280' }}
-                    className="text-xs mt-1"
-                  >
+                  <Text style={{ color: pressed ? '#ffffff' : '#6b7280' }} className="text-xs mt-1">
                     {stateInfo.displayName.split(' ')[0]}
                   </Text>
                 </View>

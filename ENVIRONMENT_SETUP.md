@@ -51,11 +51,62 @@ npm --version    # Should be 9.x.x or higher
 
 **Rate Limits:** 5,000 requests per hour (generous for development)
 
-**Cost:** FREE ✅
+**Cost:** FREE
 
 ---
 
-### 2. PostgreSQL Database with pgvector
+### 2. EIA API Key (FREE)
+
+**What it's for:** National average gas/energy prices for the dashboard
+
+**How to get it:**
+1. Visit: https://www.eia.gov/opendata/register.php
+2. Register with your email
+3. Get API key instantly
+4. Add to `.env`:
+   ```
+   EIA_API_KEY=your_key_here
+   ```
+
+**Rate Limits:** Generous for development use
+
+**Cost:** FREE
+
+---
+
+### 3. FRED API Key (FREE)
+
+**What it's for:** US Dollar index (DXY), Treasury bond interest rates, and other economic data
+
+**How to get it:**
+1. Visit: https://fred.stlouisfed.org/docs/api/api_key.html
+2. Create a FRED account (free)
+3. Request an API key
+4. Add to `.env`:
+   ```
+   FRED_API_KEY=your_key_here
+   ```
+
+**Rate Limits:** 120 requests per minute
+
+**Cost:** FREE
+
+---
+
+### 4. Treasury FiscalData API (FREE, no key needed)
+
+**What it's for:** National debt data and rate of increase over time
+
+**How to use it:**
+- Base URL: https://api.fiscaldata.treasury.gov/services/api/fiscal_service/
+- No API key required — just make requests
+- Documentation: https://fiscaldata.treasury.gov/api-documentation/
+
+**Cost:** FREE
+
+---
+
+### 5. PostgreSQL Database with pgvector (SKIP FOR MVP)
 
 **What it's for:** Store representatives, bills, votes, and embeddings
 
