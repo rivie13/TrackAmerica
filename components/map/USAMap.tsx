@@ -1,5 +1,5 @@
-import React from 'react';
-import { View, Dimensions } from 'react-native';
+import React, { useRef } from 'react';
+import { View, Dimensions, Platform } from 'react-native';
 import Svg, { Path, G } from 'react-native-svg';
 import { GestureDetector, Gesture } from 'react-native-gesture-handler';
 import Animated, { useSharedValue, useAnimatedStyle } from 'react-native-reanimated';
@@ -106,6 +106,9 @@ export default function USAMap({ className, width, height = 500, filterStateCode
     viewBox = `${minX} ${minY} ${maxX - minX} ${maxY - minY}`;
   }
 
+  // Track last tap for double-tap detection on mobile
+  const lastTapRef = useRef<{ stateId: string; time: number } | null>(null);
+
   const handleStatePress = (stateId: string) => {
     const stateInfo = getStateByFips(stateId);
     if (stateInfo) {
@@ -113,7 +116,23 @@ export default function USAMap({ className, width, height = 500, filterStateCode
     }
   };
 
+  const handleStateTap = (stateId: string) => {
+    if (Platform.OS === 'web') {
+      // Web: single click navigates
+      handleStatePress(stateId);
+      return;
+    }
 
+    // Mobile: require double-tap to prevent accidental selection during zoom/pan
+    const now = Date.now();
+    const lastTap = lastTapRef.current;
+    if (lastTap && lastTap.stateId === stateId && now - lastTap.time < 400) {
+      lastTapRef.current = null;
+      handleStatePress(stateId);
+    } else {
+      lastTapRef.current = { stateId, time: now };
+    }
+  };
 
   // Pinch gesture for zooming
   const pinchGesture = Gesture.Pinch()
@@ -180,9 +199,11 @@ export default function USAMap({ className, width, height = 500, filterStateCode
                     fill={colors.fill}
                     stroke={colors.stroke}
                     strokeWidth={2}
-                    // Use onPressIn instead of onPress - workaround for Fabric bug
-                    // See: https://github.com/software-mansion/react-native-svg/issues/2796
-                    onPressIn={() => handleStatePress(stateId)}
+                    // Web: single click selects state
+                    // Mobile: onPressIn with double-tap detection to avoid accidental taps during zoom
+                    {...(Platform.OS === 'web'
+                      ? { onPress: () => handleStateTap(stateId) }
+                      : { onPressIn: () => handleStateTap(stateId) })}
                   />
                 );
               })}
