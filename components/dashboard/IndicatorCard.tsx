@@ -87,20 +87,19 @@ export function IndicatorCard({
   }
 
   if (isError || !data) {
-    return (
-      <Pressable onPress={onRetry}>
-        <Animated.View
-          entering={FadeIn.delay(delay).duration(400)}
-          className="bg-white rounded-2xl p-3 border border-red-100"
-          style={{ ...cardStyle, minHeight: 180 }}
-        >
-          <View className="flex-1 items-center justify-center">
-            <Text className="text-red-400 text-sm">Unable to load</Text>
-            {onRetry && <Text className="text-red-300 text-xs mt-1">Tap to retry</Text>}
-          </View>
-        </Animated.View>
-      </Pressable>
+    const errorCard = (
+      <Animated.View
+        entering={FadeIn.delay(delay).duration(400)}
+        className="bg-white rounded-2xl p-3 border border-red-100"
+        style={{ ...cardStyle, minHeight: 180 }}
+      >
+        <View className="flex-1 items-center justify-center">
+          <Text className="text-red-400 text-sm">Unable to load</Text>
+          {onRetry && <Text className="text-red-300 text-xs mt-1">Tap to retry</Text>}
+        </View>
+      </Animated.View>
     );
+    return onRetry ? <Pressable onPress={onRetry}>{errorCard}</Pressable> : errorCard;
   }
 
   const selectedTrend = data.trends[selectedTrendIndex];

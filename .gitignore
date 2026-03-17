@@ -39,6 +39,9 @@ env/
 .vscode/
 .idea/
 
+# Local Claude configuration (machine-specific, not for sharing)
+.claude/
+
 # Secrets
 .env
 .env.*

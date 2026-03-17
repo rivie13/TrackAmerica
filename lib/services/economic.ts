@@ -7,14 +7,22 @@ const FRED_BASE = 'https://api.stlouisfed.org/fred';
 
 function getEiaKey(): string {
   const key = process.env.EXPO_PUBLIC_EIA_API_KEY;
-  if (!key) console.warn('EXPO_PUBLIC_EIA_API_KEY not set in .env');
-  return key ?? '';
+  if (!key) {
+    const message = 'Missing EIA API key. Set EXPO_PUBLIC_EIA_API_KEY in .env';
+    console.warn(message);
+    throw new Error(message);
+  }
+  return key;
 }
 
 function getFredKey(): string {
   const key = process.env.EXPO_PUBLIC_FRED_API_KEY;
-  if (!key) console.warn('EXPO_PUBLIC_FRED_API_KEY not set in .env');
-  return key ?? '';
+  if (!key) {
+    const message = 'Missing FRED API key. Set EXPO_PUBLIC_FRED_API_KEY in .env';
+    console.warn(message);
+    throw new Error(message);
+  }
+  return key;
 }
 
 // ── Gas Prices ────────────────────────────────────────────────────
