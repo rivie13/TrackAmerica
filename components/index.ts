@@ -22,3 +22,6 @@ export { RepCard } from './representatives/RepCard';
 
 // Chat Components (AI chatbot interface)
 // export { ChatBot } from './chat/ChatBot';
+
+// Bills Components (congressional activity feed)
+export { RecentActivityFeed } from './bills';

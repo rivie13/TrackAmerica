@@ -34,6 +34,19 @@ export interface Vote {
   voteDate: string;
 }
 
+export interface RecentBill {
+  congress: number;
+  number: string;
+  type: string; // "HR", "S", "SRES", "HJRES", etc.
+  title: string;
+  originChamber: 'House' | 'Senate';
+  latestAction?: { actionDate: string; text: string };
+  updateDate: string;
+  url: string;
+  policyArea?: string;
+  sponsorName?: string;
+}
+
 // ============================================
 // Congress.gov API Types
 // ============================================

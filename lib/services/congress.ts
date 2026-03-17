@@ -11,6 +11,7 @@ import type {
   MemberTerm,
   PartyHistoryEntry,
   SponsoredBill,
+  RecentBill,
 } from '../types';
 
 const BASE_URL = 'https://api.congress.gov/v3';
@@ -199,14 +200,23 @@ function rawToMemberDetail(raw: RawMemberDetail): CongressMemberDetail {
     officeAddress = parts.join(', ');
   }
 
+  // Party: detail endpoint has no top-level party field — fall back to partyHistory
+  const latestPartyEntry =
+    raw.partyHistory?.find((p) => !p.endYear) ?? raw.partyHistory?.[raw.partyHistory.length - 1];
+
   return {
     bioguideId: raw.bioguideId,
     name: raw.invertedOrderName ?? raw.directOrderName ?? '',
     firstName: raw.firstName ?? splitFirst,
     lastName: raw.lastName ?? splitLast,
     honorificName: raw.honorificName,
-    party: normalizeParty(raw.partyName ?? raw.party),
-    partyName: raw.partyName ?? raw.party ?? 'Unknown',
+    party: normalizeParty(
+      raw.partyName ??
+        raw.party ??
+        latestPartyEntry?.partyAbbreviation ??
+        latestPartyEntry?.partyName
+    ),
+    partyName: raw.partyName ?? raw.party ?? latestPartyEntry?.partyName ?? 'Unknown',
     state: raw.state ?? '',
     chamber,
     district: raw.district,
@@ -225,13 +235,13 @@ function rawToMemberDetail(raw: RawMemberDetail): CongressMemberDetail {
 
 /**
  * Fetch current US Senators for a state.
+ * Uses /member/{stateCode} path — stateCode as query param is not supported by the API.
  * @param stateCode Two-letter uppercase state code, e.g. "CA"
  */
 export async function fetchSenators(stateCode: string): Promise<CongressMember[]> {
-  const url = buildUrl('/member', {
-    stateCode: stateCode.toUpperCase(),
+  const url = buildUrl(`/member/${stateCode.toUpperCase()}`, {
     currentMember: true,
-    limit: 10, // There are always exactly 2 senators but fetch a few extra as buffer
+    limit: 10,
   });
 
   const res = await fetch(url);
@@ -244,11 +254,11 @@ export async function fetchSenators(stateCode: string): Promise<CongressMember[]
 
 /**
  * Fetch current House members for a state.
+ * Uses /member/{stateCode} path — stateCode as query param is not supported by the API.
  * @param stateCode Two-letter uppercase state code, e.g. "CA"
  */
 export async function fetchHouseMembers(stateCode: string): Promise<CongressMember[]> {
-  const url = buildUrl('/member', {
-    stateCode: stateCode.toUpperCase(),
+  const url = buildUrl(`/member/${stateCode.toUpperCase()}`, {
     currentMember: true,
     limit: 75, // Largest delegation is California with 52 seats
   });
@@ -309,4 +319,58 @@ export async function fetchSponsoredLegislation(
     policyArea: b.policyArea?.name,
     url: b.url ?? '',
   }));
+}
+
+// ── Raw bill list shape ──────────────────────────────────────────
+
+interface RawBillListItem {
+  congress?: number;
+  number?: string;
+  type?: string;
+  title?: string;
+  originChamber?: string;
+  updateDate?: string;
+  url?: string;
+  policyArea?: { name?: string };
+  latestAction?: { actionDate?: string; text?: string };
+  sponsors?: Array<{ firstName?: string; lastName?: string }>;
+}
+
+/**
+ * Fetch the most recently updated bills from the current Congress.
+ * Uses GET /bill/{congress}?sort=updateDate+desc
+ * @param limit Number of bills to return (default 10)
+ */
+export async function fetchRecentBills(limit = 10): Promise<RecentBill[]> {
+  const url = buildUrl(`/bill/${CURRENT_CONGRESS}`, {
+    sort: 'updateDate+desc',
+    limit,
+  });
+
+  const res = await fetch(url);
+  if (!res.ok) throw new Error(`Congress API error ${res.status}: ${res.statusText}`);
+  const json = await res.json();
+
+  const bills: RawBillListItem[] = json.bills ?? [];
+  return bills.map((b) => {
+    const sponsor = b.sponsors?.[0];
+    const sponsorName = sponsor
+      ? `${sponsor.firstName ?? ''} ${sponsor.lastName ?? ''}`.trim()
+      : undefined;
+    const chamber = b.originChamber?.toLowerCase().includes('senate') ? 'Senate' : 'House';
+    return {
+      congress: b.congress ?? CURRENT_CONGRESS,
+      number: b.number ?? '',
+      type: b.type ?? '',
+      title: b.title ?? 'Untitled',
+      originChamber: chamber,
+      latestAction: b.latestAction
+        ? { actionDate: b.latestAction.actionDate ?? '', text: b.latestAction.text ?? '' }
+        : undefined,
+      updateDate: b.updateDate ?? '',
+      url: b.url ?? '',
+      policyArea: b.policyArea?.name,
+      sponsorName,
+    };
+  });
 }

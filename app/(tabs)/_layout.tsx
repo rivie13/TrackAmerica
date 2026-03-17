@@ -11,6 +11,7 @@ export default function TabsLayout() {
       screenOptions={{
         headerShown: true,
         headerTitle: 'TrackAmerica',
+        headerBackVisible: false,
         headerStyle: {
           backgroundColor: '#fff',
         },

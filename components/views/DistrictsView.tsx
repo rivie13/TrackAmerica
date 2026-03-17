@@ -37,7 +37,12 @@ export function DistrictsView({ stateCode }: DistrictsViewProps) {
     <ScrollView className="flex-1 bg-white" contentContainerStyle={{ paddingBottom: 32 }}>
       {/* Congressional District Map */}
       <View className="items-center justify-center mb-4">
-        <DistrictMap stateCode={stateCode.toUpperCase()} width={mapSize} height={mapSize} />
+        <DistrictMap
+          stateCode={stateCode.toUpperCase()}
+          width={mapSize}
+          height={mapSize}
+          members={houseMembers ?? []}
+        />
       </View>
 
       {/* House Members section */}

@@ -1,6 +1,6 @@
 import { useState } from 'react';
-import { ScrollView, View, Text } from 'react-native';
-import { useLocalSearchParams, Stack } from 'expo-router';
+import { ScrollView, View, Text, Pressable } from 'react-native';
+import { useLocalSearchParams, Stack, useRouter } from 'expo-router';
 import Animated, { FadeIn } from 'react-native-reanimated';
 
 import { getStateInfo } from '@/lib/data/states';
@@ -21,6 +21,7 @@ type ViewMode = 'districts' | 'senators';
 export default function StateDetailScreen() {
   const { code } = useLocalSearchParams<{ code: string }>();
   const stateCode = code?.toUpperCase();
+  const router = useRouter();
 
   // View mode state (districts or senators)
   const [viewMode, setViewMode] = useState<ViewMode>('districts');
@@ -47,12 +48,33 @@ export default function StateDetailScreen() {
 
   return (
     <>
-      <Stack.Screen options={{ title: stateInfo.displayName }} />
+      <Stack.Screen
+        options={{
+          title: '',
+          headerLeft: () => (
+            <Pressable
+              onPress={() => router.push('/')}
+              style={{ marginLeft: 4, paddingVertical: 4, paddingHorizontal: 8 }}
+            >
+              <Text style={{ color: '#f4511e', fontSize: 15, fontWeight: '600' }}>
+                ← Back to National Map
+              </Text>
+            </Pressable>
+          ),
+        }}
+      />
       <ScrollView className="flex-1 bg-white">
         <View className="flex-1">
           {/* State Header */}
-          <Animated.View entering={FadeIn} className="items-center justify-center py-6 px-4">
-            <Text className="text-4xl font-bold text-gray-800 text-center">
+          <Animated.View
+            entering={FadeIn}
+            style={{ overflow: 'visible' }}
+            className="items-center justify-center pt-6 px-4"
+          >
+            <Text
+              style={{ overflow: 'visible', paddingBottom: 8 }}
+              className="text-4xl font-bold text-gray-800 text-center"
+            >
               {stateInfo.displayName}
             </Text>
           </Animated.View>

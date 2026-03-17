@@ -5,8 +5,9 @@
  */
 
 import React from 'react';
-import { View, Text, ScrollView, ActivityIndicator } from 'react-native';
+import { View, Text, ScrollView, ActivityIndicator, Dimensions } from 'react-native';
 
+import { SenatorMap } from '@/components/map/SenatorMap';
 import { RepCard } from '@/components/representatives/RepCard';
 import { useSenators } from '@/lib/hooks/useCongress';
 import { STATE_INFO } from '@/lib/data/states';
@@ -30,6 +31,16 @@ export function SenatorsView({ stateCode }: SenatorsViewProps) {
 
   return (
     <ScrollView className="flex-1 bg-white" contentContainerStyle={{ paddingBottom: 32 }}>
+      {/* State map split by senator parties */}
+      <View className="items-center justify-center mb-2">
+        <SenatorMap
+          stateCode={stateCode.toUpperCase()}
+          width={Math.min(Dimensions.get('window').width - 32, 500)}
+          height={260}
+          senators={senators ?? []}
+        />
+      </View>
+
       <View className="px-4 pt-4">
         {/* Section header */}
         <Text className="text-xl font-bold text-gray-900 mb-1">{stateInfo.name} Senators</Text>

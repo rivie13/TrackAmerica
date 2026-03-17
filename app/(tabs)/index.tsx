@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { View, ScrollView, Text, Pressable, Linking } from 'react-native';
 import Animated, { FadeInDown, FadeInUp } from 'react-native-reanimated';
 import Svg, { Path } from 'react-native-svg';
-import { USAMap, StateSearch, SmallStateButtons } from '@/components';
+import { USAMap, StateSearch, SmallStateButtons, RecentActivityFeed } from '@/components';
 import { NationalDashboard } from '@/components/dashboard';
 import { LoadingScreen } from '@/components/ui/LoadingScreen';
 
@@ -110,6 +110,11 @@ export default function HomeScreen() {
               <USAMap width="100%" height={500} />
             </View>
           </View>
+        </Animated.View>
+
+        {/* Recent Congressional Activity */}
+        <Animated.View entering={FadeInUp.delay(850).duration(600)} className="px-4 mt-6">
+          <RecentActivityFeed />
         </Animated.View>
 
         {/* Footer */}

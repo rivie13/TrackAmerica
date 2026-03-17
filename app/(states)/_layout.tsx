@@ -10,7 +10,7 @@ export default function StatesLayout() {
     <Stack
       screenOptions={{
         headerShown: true,
-        headerBackTitle: 'Back',
+        headerBackTitle: 'Back to National Map',
         headerTintColor: '#f4511e',
       }}
     />

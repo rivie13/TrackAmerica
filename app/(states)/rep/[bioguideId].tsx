@@ -224,8 +224,8 @@ export default function RepDetailScreen() {
 
             {bills &&
               bills.length > 0 &&
-              bills.map((bill) => (
-                <BillItem key={`${bill.congress}-${bill.type}-${bill.number}`} bill={bill} />
+              bills.map((bill, index) => (
+                <BillItem key={bill.url || `bill-${index}`} bill={bill} />
               ))}
 
             {bills && bills.length === 0 && (
