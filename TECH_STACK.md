@@ -1,17 +1,20 @@
 # TrackAmerica.com - Tech Stack
 
-**Last Updated:** September 30, 2025  
+**Last Updated:** March 16, 2026
 **Philosophy:** Keep It Simple, Stupid (KISS)
+**Focus:** Federal level only (state/local later)
 
 ---
 
-## 🎯 Project Goal
+## Project Goal
 
-Build a **web + mobile app** that shows:
-1. Interactive USA map
-2. Federal representatives by state
-3. How representatives voted on bills
-4. AI chatbot to answer questions about bills
+Build an **all-in-one national dashboard** (web + mobile) that shows:
+
+1. National indicators — gas prices, dollar value, interest rates, national debt, approval ratings
+2. Interactive USA map — click a state to see its representatives
+3. Federal representatives by state — senators and house members
+4. How representatives voted on bills
+5. AI Q&A to answer questions about bills
 
 ---
 
@@ -25,12 +28,11 @@ Build a **web + mobile app** that shows:
 | **React Native Web** | Web support | Automatically included with Expo |
 | **NativeWind** | Styling | Tailwind CSS for React Native |
 | **TypeScript** | Language | Type safety, better DX |
+| **@tanstack/react-query** | Data fetching | Caching, loading states, refetching for all API calls |
 | **AsyncStorage** | Local storage | Save user preferences on device |
 
 ### Map Solution
-- **Option 1:** `react-native-svg` + custom SVG USA map (simple, lightweight)
-- **Option 2:** `react-native-maps` (if needed later)
-- **Option 3:** react usa map library????
+- `react-native-svg` + TopoJSON USA map (implemented, working)
 ---
 
 ## ⚙️ Backend API
@@ -75,17 +77,28 @@ Build a **web + mobile app** that shows:
 
 ---
 
-## 📡 External APIs
+## External APIs
 
 | API | Purpose | Cost |
 |-----|---------|------|
 | **Congress.gov API** | Get representatives, bills, votes | FREE (5,000 req/hour) |
+| **EIA API** | Gas/energy prices (national avg) | FREE (api.eia.gov) |
+| **FRED API** | Dollar index, interest rates, economic data | FREE (fred.stlouisfed.org) |
+| **Treasury FiscalData API** | National debt data | FREE, no key needed (fiscaldata.treasury.gov) |
+| **Approval ratings** | Congress/President/SCOTUS approval | TBD — RealClearPolitics/Gallup (may need scraping or static data) |
 
-**Endpoints Used:**
+**Congress.gov Endpoints Used:**
 - `/member/{stateCode}` - Get representatives by state
 - `/bill/{congress}/{billType}/{billNumber}` - Get bill details
 - `/house-vote/{congress}/{session}/{voteNumber}/members` - House votes
 - Bill text and summaries
+
+**National Dashboard Data Points:**
+- Avg gas price — trends over 3/6/9/12 months
+- US Dollar valuation (DXY) — trends over 1/5/10 years
+- Treasury bond interest rates — trends over 6mo/1/3/5 years
+- National debt — rate of increase over 1/5/10/20 years
+- Congress/President/Supreme Court approval — trends over 6mo/1/3/5 years
 
 ---
 
@@ -158,21 +171,30 @@ Build a **web + mobile app** that shows:
 
 ---
 
-## 🔐 Environment Variables Needed
-- **Azure OpenAI** - GPT-4o (TBD what model will be used) for chatbot, embeddings for semantic search
+## Environment Variables Needed
 
 ```bash
-# Congress.gov API
+# Congress.gov API (FREE)
 CONGRESS_API_KEY=your_key_here
 
-# Database
-DATABASE_URL=postgresql://user:password@localhost:5432/trackamerica
+# EIA API - gas/energy prices (FREE)
+# Note: Expo dashboard reads EXPO_PUBLIC_EIA_API_KEY (public, bundled into client)
+EXPO_PUBLIC_EIA_API_KEY=your_key_here
 
-# Azure OpenAI
-AZURE_OPENAI_API_KEY=your_key_here
-AZURE_OPENAI_ENDPOINT=https://your-resource.openai.azure.com/
-AZURE_OPENAI_DEPLOYMENT_NAME=gpt-4o
-AZURE_OPENAI_EMBEDDING_DEPLOYMENT=text-embedding-ada-002
+# FRED API - dollar index, interest rates, economic data (FREE)
+# Note: Expo dashboard reads EXPO_PUBLIC_FRED_API_KEY (public, bundled into client)
+EXPO_PUBLIC_FRED_API_KEY=your_key_here
+
+# Treasury FiscalData API - no key needed
+
+# Database (skip for MVP - call APIs directly)
+# DATABASE_URL=postgresql://user:password@localhost:5432/trackamerica
+
+# Azure OpenAI (TBD - for AI Q&A phase)
+# AZURE_OPENAI_API_KEY=your_key_here
+# AZURE_OPENAI_ENDPOINT=https://your-resource.openai.azure.com/
+# AZURE_OPENAI_DEPLOYMENT_NAME=gpt-4o
+# AZURE_OPENAI_EMBEDDING_DEPLOYMENT=text-embedding-ada-002
 
 # API Settings
 PORT=3000
