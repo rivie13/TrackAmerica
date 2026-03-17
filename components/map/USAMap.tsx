@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { View, Dimensions } from 'react-native';
 import Svg, { Path, G } from 'react-native-svg';
 import { GestureDetector, Gesture } from 'react-native-gesture-handler';
@@ -38,7 +38,6 @@ interface USAMapProps {
  */
 export default function USAMap({ className, width, height = 500, filterStateCode }: USAMapProps) {
   const router = useRouter();
-  const [hoveredState, setHoveredState] = useState<string | null>(null);
 
   // Zoom and pan state
   const scale = useSharedValue(1);
@@ -114,6 +113,8 @@ export default function USAMap({ className, width, height = 500, filterStateCode
     }
   };
 
+
+
   // Pinch gesture for zooming
   const pinchGesture = Gesture.Pinch()
     .onUpdate((event) => {
@@ -127,14 +128,13 @@ export default function USAMap({ className, width, height = 500, filterStateCode
 
   // Pan gesture for dragging - only activate after minimum distance
   const panGesture = Gesture.Pan()
-    .minDistance(20) // Require 20px movement before activating pan (increased from 10 for better tap detection)
+    .minDistance(20) // Require 20px movement before activating pan
     .onUpdate((event) => {
       const newX = savedTranslateX.value + event.translationX;
       const newY = savedTranslateY.value + event.translationY;
 
       // Calculate bounds based on current scale
-      // When zoomed in, allow more panning; when zoomed out, restrict panning
-      const maxPan = (scale.value - 1) * 200; // Allow more panning when zoomed in
+      const maxPan = (scale.value - 1) * 200;
 
       // Clamp translation to prevent panning too far off screen
       translateX.value = Math.max(-maxPan, Math.min(maxPan, newX));
@@ -145,8 +145,7 @@ export default function USAMap({ className, width, height = 500, filterStateCode
       savedTranslateY.value = translateY.value;
     });
 
-  // Combine gestures - pinch and pan simultaneously
-  // Note: We don't add tap here because SVG Path elements handle their own onPress
+  // Combine gestures for zoom/pan (tap is handled by SVG Path onPressIn)
   const composedGesture = Gesture.Simultaneous(pinchGesture, panGesture);
 
   // Animated styles for zoom and pan
@@ -167,7 +166,6 @@ export default function USAMap({ className, width, height = 500, filterStateCode
               {features.map((feature: any) => {
                 const stateId = feature.id;
                 const stateInfo = getStateByFips(stateId);
-                const isHovered = hoveredState === stateId;
                 const pathData = geoPath(feature.geometry);
 
                 // Get colors based on political leaning
@@ -176,26 +174,16 @@ export default function USAMap({ className, width, height = 500, filterStateCode
                   : { fill: '#d6d6da', stroke: '#ffffff' };
 
                 return (
-                  <G key={stateId}>
-                    {/* Invisible larger hit area for easier tapping */}
-                    <Path
-                      d={pathData}
-                      fill="transparent"
-                      stroke="transparent"
-                      strokeWidth={30} // Large invisible stroke for better touch target (increased from 15)
-                      onPress={() => handleStatePress(stateId)}
-                      onPressIn={() => setHoveredState(stateId)}
-                      onPressOut={() => setHoveredState(null)}
-                    />
-                    {/* Visible state path */}
-                    <Path
-                      d={pathData}
-                      fill={isHovered ? '#60a5fa' : colors.fill}
-                      stroke={colors.stroke}
-                      strokeWidth={2}
-                      pointerEvents="none" // Let the invisible overlay handle touches
-                    />
-                  </G>
+                  <Path
+                    key={stateId}
+                    d={pathData}
+                    fill={colors.fill}
+                    stroke={colors.stroke}
+                    strokeWidth={2}
+                    // Use onPressIn instead of onPress - workaround for Fabric bug
+                    // See: https://github.com/software-mansion/react-native-svg/issues/2796
+                    onPressIn={() => handleStatePress(stateId)}
+                  />
                 );
               })}
             </G>
