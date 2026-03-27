@@ -36,7 +36,8 @@ env/
 .venv/
 
 # IDEs
-.vscode/
+.vscode/*
+!.vscode/tasks.json
 .idea/
 
 # Secrets
@@ -48,3 +49,9 @@ env/
 
 # Logs
 *.log
+
+
+# claude files
+
+# agents files
+

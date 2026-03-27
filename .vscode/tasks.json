@@ -1,0 +1,153 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "Dev: Start Frontend (Expo)",
+      "type": "shell",
+      "command": "npm run start",
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
+      "isBackground": true,
+      "problemMatcher": [],
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated",
+        "group": "dev-servers"
+      }
+    },
+    {
+      "label": "Dev: Start Frontend (Web)",
+      "type": "shell",
+      "command": "npm run web",
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
+      "isBackground": true,
+      "problemMatcher": [],
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated",
+        "group": "dev-servers"
+      }
+    },
+    {
+      "label": "Dev: Start API Server",
+      "type": "shell",
+      "command": "npm run api",
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
+      "isBackground": true,
+      "problemMatcher": [],
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated",
+        "group": "dev-servers"
+      }
+    },
+    {
+      "label": "Dev: Start API + Frontend (Expo)",
+      "dependsOrder": "parallel",
+      "dependsOn": [
+        "Dev: Start API Server",
+        "Dev: Start Frontend (Expo)"
+      ],
+      "problemMatcher": []
+    },
+    {
+      "label": "Dev: Start API + Frontend (Web)",
+      "dependsOrder": "parallel",
+      "dependsOn": [
+        "Dev: Start API Server",
+        "Dev: Start Frontend (Web)"
+      ],
+      "problemMatcher": []
+    },
+    {
+      "label": "Build: API",
+      "type": "shell",
+      "command": "npm run api:build",
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
+      "group": "build",
+      "problemMatcher": []
+    },
+    {
+      "label": "Checks: Lint",
+      "type": "shell",
+      "command": "npm run lint",
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
+      "group": "test",
+      "problemMatcher": []
+    },
+    {
+      "label": "Checks: Lint Fix",
+      "type": "shell",
+      "command": "npm run lint:fix",
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "Checks: Format Check",
+      "type": "shell",
+      "command": "npm run format:check",
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "Checks: Format Write",
+      "type": "shell",
+      "command": "npm run format",
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "Checks: Type Check",
+      "type": "shell",
+      "command": "npm run type-check",
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "Checks: Tests",
+      "type": "shell",
+      "command": "npm run test",
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
+      "group": "test",
+      "problemMatcher": []
+    },
+    {
+      "label": "Checks: Pre-commit (husky equivalent)",
+      "dependsOrder": "sequence",
+      "dependsOn": [
+        "Checks: Lint",
+        "Checks: Format Check",
+        "Checks: Type Check"
+      ],
+      "problemMatcher": []
+    },
+    {
+      "label": "Git: Commitlint (last commit)",
+      "type": "shell",
+      "command": "npx --no -- commitlint --from HEAD~1 --to HEAD",
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
+      "problemMatcher": []
+    }
+  ]
+}
